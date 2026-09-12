@@ -66,7 +66,7 @@ export default function Table({
                   {columns.map((col, cIdx) => (
                     <td
                       key={cIdx}
-                      className={`px-4 py-3.5 ${
+                      className={`px-4 py-3.5 align-middle ${
                         col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'
                       } ${col.className || ''}`}
                     >

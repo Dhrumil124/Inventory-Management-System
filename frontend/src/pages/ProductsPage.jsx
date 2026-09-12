@@ -231,7 +231,7 @@ export default function ProductsPage() {
         }
 
         return (
-          <div className="flex flex-col items-end gap-1">
+          <div className="flex items-center justify-end gap-2">
             <span className="font-mono font-bold text-zinc-900">{stock.toLocaleString()}</span>
             <Badge variant={badgeType} size="sm">
               {label}
@@ -244,7 +244,7 @@ export default function ProductsPage() {
       header: 'Status',
       accessor: 'status',
       align: 'center',
-      render: (p) => <Badge variant={p.status}>{p.status}</Badge>,
+      render: (p) => <Badge variant={p.status} size="sm">{p.status}</Badge>,
     },
     {
       header: 'Actions',
