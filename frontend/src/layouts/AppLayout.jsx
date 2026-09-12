@@ -51,11 +51,11 @@ export default function AppLayout() {
   ];
 
   return (
-    <div className="min-h-screen bg-zinc-50 flex">
+    <div className="h-screen bg-zinc-50 flex overflow-hidden">
       {/* ========================================================================= */}
-      {/* DESKTOP SIDEBAR */}
+      {/* DESKTOP SIDEBAR (STATIC / FIXED) */}
       {/* ========================================================================= */}
-      <aside className="hidden lg:flex lg:flex-col w-64 bg-white border-r border-zinc-200/90 shrink-0">
+      <aside className="hidden lg:flex lg:flex-col w-64 bg-white border-r border-zinc-200/90 shrink-0 h-full select-none">
         {/* Brand Header */}
         <div className="h-16 flex items-center px-6 border-b border-zinc-100 gap-3">
           <div className="w-9 h-9 rounded-xl bg-forest-900 text-white flex items-center justify-center shadow-xs">
@@ -192,9 +192,9 @@ export default function AppLayout() {
       {/* ========================================================================= */}
       {/* MAIN LAYOUT WRAPPER */}
       {/* ========================================================================= */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Header */}
-        <header className="h-16 bg-white border-b border-zinc-200/80 px-4 sm:px-6 flex items-center justify-between shrink-0 sticky top-0 z-20">
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+        {/* Top Header (Static) */}
+        <header className="h-16 bg-white border-b border-zinc-200/80 px-4 sm:px-6 flex items-center justify-between shrink-0 z-20">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileDrawerOpen(true)}
@@ -264,9 +264,11 @@ export default function AppLayout() {
           </div>
         </header>
 
-        {/* Main Content Area */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
-          <Outlet />
+        {/* Main Content Area (Independently scrollable) */}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 focus:outline-none">
+          <div className="max-w-7xl mx-auto w-full pb-12">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

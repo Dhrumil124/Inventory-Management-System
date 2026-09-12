@@ -57,7 +57,7 @@ export default function StockOutPage() {
 
       setIsLoadingStock(true);
       try {
-        const res = await api.get(`/inventory?warehouseId=${form.warehouseId}&search=${form.productId}`);
+        const res = await api.get(`/inventory?warehouseId=${form.warehouseId}&productId=${form.productId}`);
         const match = res.data.data?.find(
           (i) => i.warehouse_id === parseInt(form.warehouseId, 10) && i.product_id === parseInt(form.productId, 10)
         );

@@ -64,7 +64,7 @@ export default function TransfersPage() {
       setIsLoadingStock(true);
       try {
         if (form.sourceWarehouseId) {
-          const resSrc = await api.get(`/inventory?warehouseId=${form.sourceWarehouseId}&search=${form.productId}`);
+          const resSrc = await api.get(`/inventory?warehouseId=${form.sourceWarehouseId}&productId=${form.productId}`);
           const matchSrc = resSrc.data.data?.find(
             (i) => i.warehouse_id === parseInt(form.sourceWarehouseId, 10) && i.product_id === parseInt(form.productId, 10)
           );
@@ -74,7 +74,7 @@ export default function TransfersPage() {
         }
 
         if (form.destinationWarehouseId) {
-          const resDst = await api.get(`/inventory?warehouseId=${form.destinationWarehouseId}&search=${form.productId}`);
+          const resDst = await api.get(`/inventory?warehouseId=${form.destinationWarehouseId}&productId=${form.productId}`);
           const matchDst = resDst.data.data?.find(
             (i) => i.warehouse_id === parseInt(form.destinationWarehouseId, 10) && i.product_id === parseInt(form.productId, 10)
           );

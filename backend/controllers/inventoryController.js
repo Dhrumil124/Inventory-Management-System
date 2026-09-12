@@ -12,6 +12,7 @@ class InventoryController {
 
       const search = req.query.search ? `%${req.query.search.trim()}%` : null;
       const warehouseId = req.query.warehouseId ? parseInt(req.query.warehouseId, 10) : null;
+      const productId = req.query.productId ? parseInt(req.query.productId, 10) : null;
       const categoryId = req.query.categoryId ? parseInt(req.query.categoryId, 10) : null;
       const stockStatus = req.query.stockStatus || null;
 
@@ -37,6 +38,12 @@ class InventoryController {
         }
         whereConditions.push('i.warehouse_id = ?');
         params.push(warehouseId);
+      }
+
+      // Product filter
+      if (productId) {
+        whereConditions.push('i.product_id = ?');
+        params.push(productId);
       }
 
       // Category filter
