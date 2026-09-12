@@ -41,8 +41,8 @@ export default function AppLayout() {
     { name: 'Categories', path: '/categories', icon: SlidersHorizontal },
     { name: 'Warehouses', path: '/warehouses', icon: Warehouse },
     { name: 'Stock In', path: '/stock-in', icon: ArrowDownRight },
-    { name: 'Stock Out', path: '/stock-out', icon: ArrowUpRight },
-    { name: 'Transfers', path: '/transfers', icon: ArrowLeftRight },
+    // Transfers: Admin & Manager only (Staff prohibited)
+    ...(hasRole(['ADMIN', 'MANAGER']) ? [{ name: 'Transfers', path: '/transfers', icon: ArrowLeftRight }] : []),
     { name: 'History & Audit', path: '/history', icon: History },
     { name: 'Stock Alerts', path: '/alerts', icon: AlertCircle },
     // Admin only

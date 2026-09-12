@@ -8,7 +8,7 @@ class WarehouseController {
       let query;
       let params = [];
 
-      if (req.user.role === ROLES.ADMIN) {
+      if (req.user.role === ROLES.ADMIN || req.query.all === 'true') {
         query = `
           SELECT w.*,
             (SELECT COUNT(DISTINCT i.product_id) FROM inventory i WHERE i.warehouse_id = w.id AND i.quantity > 0) AS total_active_skus,
@@ -16,6 +16,7 @@ class WarehouseController {
             (SELECT COUNT(*) FROM inventory_alerts a WHERE a.warehouse_id = w.id AND a.status = 'ACTIVE') AS active_alerts_count,
             (SELECT COUNT(*) FROM user_warehouses uw WHERE uw.warehouse_id = w.id) AS assigned_staff_count
           FROM warehouses w
+          WHERE w.status = 'ACTIVE'
           ORDER BY w.name ASC
         `;
       } else {

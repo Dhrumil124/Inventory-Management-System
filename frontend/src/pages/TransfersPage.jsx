@@ -14,6 +14,7 @@ export default function TransfersPage() {
   const [searchParams] = useSearchParams();
 
   const [warehouses, setWarehouses] = useState([]);
+  const [destinationWarehouses, setDestinationWarehouses] = useState([]);
   const [products, setProducts] = useState([]);
   const [sourceStock, setSourceStock] = useState(null);
   const [destStock, setDestStock] = useState(null);
@@ -21,7 +22,7 @@ export default function TransfersPage() {
 
   const [form, setForm] = useState({
     sourceWarehouseId: searchParams.get('sourceWarehouseId') || '',
-    destinationWarehouseId: '',
+    destinationWarehouseId: searchParams.get('destinationWarehouseId') || '',
     productId: searchParams.get('productId') || '',
     quantity: '',
     reference: '',
@@ -37,12 +38,14 @@ export default function TransfersPage() {
   useEffect(() => {
     async function loadInitialData() {
       try {
-        const [whRes, prodRes, histRes] = await Promise.all([
+        const [whRes, destWhRes, prodRes, histRes] = await Promise.all([
           api.get('/warehouses'),
+          api.get('/warehouses?all=true'),
           api.get('/products?limit=100'),
           api.get('/inventory/history?movementType=TRANSFER_OUT&limit=5'),
         ]);
         if (whRes.data.success) setWarehouses(whRes.data.data);
+        if (destWhRes.data.success) setDestinationWarehouses(destWhRes.data.data);
         if (prodRes.data.success) setProducts(prodRes.data.data);
         if (histRes.data.success) setRecentTransfers(histRes.data.data);
       } catch (err) {
@@ -94,7 +97,8 @@ export default function TransfersPage() {
 
   const selectedProductObj = products.find((p) => String(p.id) === String(form.productId));
   const sourceWhObj = warehouses.find((w) => String(w.id) === String(form.sourceWarehouseId));
-  const destWhObj = warehouses.find((w) => String(w.id) === String(form.destinationWarehouseId));
+  const allWhList = destinationWarehouses.length > 0 ? destinationWarehouses : warehouses;
+  const destWhObj = allWhList.find((w) => String(w.id) === String(form.destinationWarehouseId));
 
   const qtyNumber = parseInt(form.quantity, 10) || 0;
   const isOverdraft = sourceStock !== null && qtyNumber > sourceStock;
@@ -281,7 +285,7 @@ export default function TransfersPage() {
                 label="Destination Warehouse"
                 value={form.destinationWarehouseId}
                 onChange={(e) => setForm({ ...form, destinationWarehouseId: e.target.value })}
-                options={warehouses
+                options={allWhList
                   .filter((w) => String(w.id) !== String(form.sourceWarehouseId))
                   .map((w) => ({ value: String(w.id), label: `${w.name} (${w.code})` }))}
                 placeholder="Select Destination Facility"

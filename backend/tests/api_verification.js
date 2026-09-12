@@ -298,9 +298,19 @@ async function runTests() {
     // ------------------------------------------------------------------------
     // TEST 4: Stock Transfer with Deterministic Row Locking
     // ------------------------------------------------------------------------
-    console.log('\n▶ TEST 4: Atomic Stock Transfer & Dual-Warehouse Verification');
+    console.log('\n▶ TEST 4: Atomic Stock Transfer & Role Restrictions (Manager/Admin Only)');
 
-    // Staff Multi is assigned to BOTH Ahmedabad (WH 1) and Surat (WH 2) -> permitted!
+    // 4.1 Staff is strictly prohibited from executing transfers (Option 2 policy)
+    const staffTransferAttempt = await request('POST', '/api/inventory/transfer', {
+      productId: testProductId,
+      sourceWarehouseId: 1,
+      destinationWarehouseId: 2,
+      quantity: 25,
+      reason: 'Staff unauthorized transfer attempt'
+    }, staffMultiToken);
+    assert(staffTransferAttempt.status === 403, 'Staff transfer attempt rejected with 403 Forbidden (Transfers reserved for Manager/Admin)');
+
+    // 4.2 Authorized Manager Ahmedabad transfers stock to Surat
     const validTransfer = await request('POST', '/api/inventory/transfer', {
       productId: testProductId,
       sourceWarehouseId: 1,
@@ -308,8 +318,8 @@ async function runTests() {
       quantity: 25,
       reference: 'TEST-TRF-01',
       reason: 'Transfer stock between authorized branches'
-    }, staffMultiToken);
-    assert(validTransfer.status === 201, 'Authorized transfer between assigned warehouses succeeded with 201 Created');
+    }, managerAmdToken);
+    assert(validTransfer.status === 201, 'Authorized Manager transfer succeeded with 201 Created');
     assert(validTransfer.data.data.source.newQuantity === 45, 'Source WH 1 updated to 45 (70 - 25)');
     assert(validTransfer.data.data.destination.newQuantity === 25, 'Destination WH 2 updated to 25 (0 + 25)');
 

@@ -105,14 +105,16 @@ export default function DashboardPage() {
           >
             Stock Out
           </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            icon={ArrowLeftRight}
-            onClick={() => navigate('/transfers')}
-          >
-            Transfer
-          </Button>
+          {(hasRole('ADMIN') || hasRole('MANAGER')) && (
+            <Button
+              size="sm"
+              variant="outline"
+              icon={ArrowLeftRight}
+              onClick={() => navigate('/transfers')}
+            >
+              Transfer
+            </Button>
+          )}
           {(hasRole('ADMIN') || hasRole('MANAGER')) && (
             <Button
               size="sm"

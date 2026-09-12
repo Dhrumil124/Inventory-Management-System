@@ -106,27 +106,22 @@ function verifyTransferWarehouseAccess() {
         return next();
       }
 
-      // For STAFF: explicitly enforce that BOTH source AND destination warehouses are assigned
+      // For STAFF: Transfers are restricted to Managers and Administrators only
       if (req.user.role === ROLES.STAFF) {
-        const hasSource = req.user.assignedWarehouseIds.includes(sourceWarehouseId);
-        const hasDest = req.user.assignedWarehouseIds.includes(destinationWarehouseId);
-
-        if (!hasSource || !hasDest) {
-          return errorResponse(
-            res,
-            'Forbidden: Staff can only transfer stock between warehouses to which they are explicitly assigned.',
-            403
-          );
-        }
+        return errorResponse(
+          res,
+          'Forbidden: Staff members are not authorized to execute inter-warehouse transfers. Transfers are reserved for Managers and Administrators.',
+          403
+        );
       }
 
-      // For MANAGER: must be assigned to the source warehouse (and if transferring, destination must be valid)
+      // For MANAGER: must be assigned to the source warehouse
       if (req.user.role === ROLES.MANAGER) {
         const hasSource = req.user.assignedWarehouseIds.includes(sourceWarehouseId);
         if (!hasSource) {
           return errorResponse(
             res,
-            'Forbidden: Manager can only initiate transfers from their assigned warehouses.',
+            'Forbidden: Managers can only initiate transfers from their assigned facilities.',
             403
           );
         }

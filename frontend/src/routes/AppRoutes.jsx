@@ -51,7 +51,15 @@ export default function AppRoutes() {
         <Route path="/inventory" element={<InventoryPage />} />
         <Route path="/stock-in" element={<StockInPage />} />
         <Route path="/stock-out" element={<StockOutPage />} />
-        <Route path="/transfers" element={<TransfersPage />} />
+        {/* Transfers: Restricted to Admin and Manager only */}
+        <Route
+          path="/transfers"
+          element={
+            <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
+              <TransfersPage />
+            </ProtectedRoute>
+          }
+        />
         
         {/* Adjustment: Restricted to Admin and Manager only */}
         <Route
