@@ -6,8 +6,11 @@ export default function AuthLayout() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 selection:bg-brand-100 selection:text-brand-900">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-600 text-white shadow-xs border border-brand-500/30 mb-4">
-          <Boxes className="w-6 h-6 text-white" />
+        <div 
+          className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-600 text-white shadow-md border border-indigo-500/30 mb-4"
+          style={{ backgroundColor: '#4f46e5', color: '#ffffff' }}
+        >
+          <Boxes className="w-6 h-6 text-white" style={{ color: '#ffffff' }} />
         </div>
         <h2 className="text-2xl font-bold tracking-tight text-slate-900">
           Inventory Management System

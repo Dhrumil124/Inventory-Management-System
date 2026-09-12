@@ -58,8 +58,11 @@ export default function AppLayout() {
       <aside className="hidden lg:flex lg:flex-col w-64 bg-[#0b0f19] border-r border-slate-800/80 shrink-0 h-full select-none text-slate-300">
         {/* Brand Header */}
         <div className="h-16 flex items-center px-5 border-b border-slate-800/80 gap-3">
-          <div className="w-9 h-9 rounded-lg bg-brand-600 text-white flex items-center justify-center shadow-xs border border-brand-500/30">
-            <Boxes className="w-5 h-5 text-white" />
+          <div 
+            className="w-9 h-9 rounded-lg bg-indigo-600 text-white flex items-center justify-center shadow-xs border border-indigo-500/30"
+            style={{ backgroundColor: '#4f46e5', color: '#ffffff' }}
+          >
+            <Boxes className="w-5 h-5 text-white" style={{ color: '#ffffff' }} />
           </div>
           <div>
             <span className="font-bold text-white text-sm tracking-tight block">Inventory Hub</span>
@@ -140,8 +143,11 @@ export default function AppLayout() {
           <div className="relative w-72 max-w-[80%] bg-[#0b0f19] text-slate-300 h-full flex flex-col z-10 shadow-dropdown border-r border-slate-800/80">
             <div className="h-16 flex items-center justify-between px-5 border-b border-slate-800/80">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-brand-600 text-white flex items-center justify-center shadow-xs">
-                  <Boxes className="w-4 h-4 text-white" />
+                <div 
+                  className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center shadow-xs border border-indigo-500/30"
+                  style={{ backgroundColor: '#4f46e5', color: '#ffffff' }}
+                >
+                  <Boxes className="w-4 h-4 text-white" style={{ color: '#ffffff' }} />
                 </div>
                 <span className="font-bold text-white text-sm">Inventory Hub</span>
               </div>

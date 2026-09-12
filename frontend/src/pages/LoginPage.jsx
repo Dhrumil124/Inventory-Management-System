@@ -37,8 +37,8 @@ export default function LoginPage() {
   return (
     <div>
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-zinc-900 tracking-tight">Sign in to your account</h3>
-        <p className="text-xs text-zinc-500 mt-1">Enter your corporate credentials to access the inventory system.</p>
+        <h3 className="text-lg font-semibold text-slate-900 tracking-tight">Sign in to your account</h3>
+        <p className="text-xs text-slate-500 mt-1">Enter your corporate credentials to access the inventory system.</p>
       </div>
 
       {sessionMessage && (
@@ -79,7 +79,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-8 text-zinc-400 hover:text-zinc-600 focus:outline-none"
+            className="absolute right-3 top-8 text-slate-400 hover:text-slate-600 focus:outline-none"
             tabIndex="-1"
           >
             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -98,8 +98,8 @@ export default function LoginPage() {
         </div>
       </form>
 
-      <div className="mt-6 pt-4 border-t border-zinc-100 text-center">
-        <p className="text-[11px] text-zinc-400">
+      <div className="mt-6 pt-4 border-t border-slate-100 text-center">
+        <p className="text-[11px] text-slate-400">
           Protected by role-based authorization and activity auditing. Unauthorized access is strictly logged.
         </p>
       </div>
