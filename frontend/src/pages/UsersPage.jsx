@@ -119,7 +119,10 @@ export default function UsersPage() {
         loadUsers();
       }
     } catch (err) {
-      setFormError(err.message || 'Failed to create user.');
+      const msg = err.errors?.length
+        ? err.errors.map((e) => e.message).join(' ')
+        : (err.message || 'Failed to create user.');
+      setFormError(msg);
     } finally {
       setIsSubmitting(false);
     }
@@ -413,6 +416,7 @@ export default function UsersPage() {
               value={addForm.password}
               onChange={(e) => setAddForm({ ...addForm, password: e.target.value })}
               placeholder="Min 8 chars, mixed case & numbers"
+              helperText="Min 8 chars, 1 uppercase, 1 lowercase & 1 number"
               required
             />
             <Select

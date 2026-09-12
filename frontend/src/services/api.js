@@ -39,9 +39,17 @@ api.interceptors.response.use(
     }
 
     // Format error message
+    let message = error.response?.data?.message || error.message || 'Network error occurred. Please check your connection.';
+    if (error.response?.data?.errors && Array.isArray(error.response.data.errors) && error.response.data.errors.length > 0) {
+      const fieldErrors = error.response.data.errors.map(e => e.message).filter(Boolean);
+      if (fieldErrors.length > 0) {
+        message = fieldErrors.join(' ');
+      }
+    }
+
     const formattedError = {
       status: error.response?.status || 500,
-      message: error.response?.data?.message || error.message || 'Network error occurred. Please check your connection.',
+      message,
       errors: error.response?.data?.errors || null,
     };
 
