@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  mysql-db:
+    image: mysql:8.0
+    container_name: ims_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: inventory_db
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-production_root_password_2026}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backend/database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./backend/database/seed.sql:/docker-entrypoint-initdb.d/02_seed.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-production_root_password_2026}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ims_backend
+    restart: unless-stopped
+    environment:
+      PORT: 5000
+      NODE_ENV: production
+      DB_HOST: mysql-db
+      DB_PORT: 3306
+      DB_NAME: inventory_db
+      DB_USER: root
+      DB_PASSWORD: ${DB_ROOT_PASSWORD:-production_root_password_2026}
+      JWT_SECRET: ${JWT_SECRET:-production_secure_jwt_secret_key_change_me_2026}
+      JWT_EXPIRES_IN: 24h
+      CORS_ORIGIN: "*"
+    ports:
+      - "5000:5000"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ims_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
+    driver: local
