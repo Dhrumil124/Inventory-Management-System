@@ -137,14 +137,14 @@ export default function DashboardPage() {
           value={isLoading ? '...' : (metrics?.totalStock || 0).toLocaleString()}
           subtitle="Across assigned facilities"
           icon={Boxes}
-          variant="forest"
+          variant="brand"
         />
         <StatCard
           title="Inventory Value"
           value={isLoading ? '...' : formatCurrency(metrics?.totalInventoryValue)}
           subtitle="Calculated at unit price"
           icon={IndianRupee}
-          variant="default"
+          variant="accent"
         />
         <StatCard
           title="Active SKUs"
@@ -184,7 +184,7 @@ export default function DashboardPage() {
             title="Warehouse Inventory Breakdown"
             subtitle="Units available across your authorized facilities"
             action={
-              <Link to="/inventory" className="text-xs text-forest-800 font-medium hover:underline flex items-center gap-1">
+              <Link to="/inventory" className="text-xs text-brand-600 font-medium hover:text-brand-700 flex items-center gap-1">
                 <span>View Full Matrix</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
@@ -194,13 +194,13 @@ export default function DashboardPage() {
               <div className="space-y-4 py-2">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="animate-pulse space-y-2">
-                    <div className="h-4 bg-zinc-200/70 rounded w-1/3" />
-                    <div className="h-2 bg-zinc-100 rounded w-full" />
+                    <div className="h-4 bg-slate-200/70 rounded w-1/3" />
+                    <div className="h-2 bg-slate-100 rounded w-full" />
                   </div>
                 ))}
               </div>
             ) : stockBreakdown?.warehouseStock?.length === 0 ? (
-              <p className="text-xs text-zinc-400 py-6 text-center">No warehouse stock data available.</p>
+              <p className="text-xs text-slate-400 py-6 text-center">No warehouse stock data available.</p>
             ) : (
               <div className="space-y-4">
                 {stockBreakdown?.warehouseStock?.map((wh) => {
@@ -210,22 +210,22 @@ export default function DashboardPage() {
                     <div key={wh.id} className="group">
                       <div className="flex items-center justify-between text-xs mb-1.5">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-zinc-800 group-hover:text-forest-900 transition-colors">
+                          <span className="font-semibold text-slate-800 group-hover:text-brand-700 transition-colors">
                             {wh.name}
                           </span>
-                          <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 bg-zinc-100 rounded text-zinc-500">
+                          <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 bg-slate-100 rounded text-slate-500">
                             {wh.code}
                           </span>
                         </div>
                         <div className="text-right">
-                          <span className="font-bold text-zinc-900">{Number(wh.total_stock).toLocaleString()}</span>
-                          <span className="text-zinc-400 ml-1">units ({pct}%)</span>
+                          <span className="font-bold text-slate-900">{Number(wh.total_stock).toLocaleString()}</span>
+                          <span className="text-slate-400 ml-1">units ({pct}%)</span>
                         </div>
                       </div>
                       {/* Visual progress bar */}
-                      <div className="w-full bg-zinc-100 rounded-full h-2 overflow-hidden">
+                      <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                         <div
-                          className="bg-forest-800 h-2 rounded-full transition-all duration-500"
+                          className="bg-brand-600 h-2 rounded-full transition-all duration-500"
                           style={{ width: `${pct}%` }}
                         />
                       </div>
@@ -243,7 +243,7 @@ export default function DashboardPage() {
             title="Stock Alerts Requiring Action"
             subtitle="Products depleted below safety levels"
             action={
-              <Link to="/alerts" className="text-xs text-forest-800 font-medium hover:underline">
+              <Link to="/alerts" className="text-xs text-brand-600 font-medium hover:text-brand-700">
                 All Alerts ({metrics?.lowStockAlerts + metrics?.outOfStockAlerts || 0})
               </Link>
             }
@@ -251,25 +251,25 @@ export default function DashboardPage() {
             {isLoading ? (
               <div className="space-y-3 py-2">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="animate-pulse h-12 bg-zinc-100 rounded-lg" />
+                  <div key={i} className="animate-pulse h-12 bg-slate-100 rounded-lg" />
                 ))}
               </div>
             ) : recentActivity?.criticalAlerts?.length === 0 ? (
-              <div className="py-8 text-center text-zinc-400 text-xs">
-                <p className="font-medium text-emerald-800">Healthy Inventory</p>
-                <p className="mt-0.5 text-zinc-400">All products are currently above minimum safety stock.</p>
+              <div className="py-8 text-center text-slate-400 text-xs">
+                <p className="font-medium text-emerald-700">Healthy Inventory</p>
+                <p className="mt-0.5 text-slate-400">All products are currently above minimum safety stock.</p>
               </div>
             ) : (
               <div className="space-y-2.5">
                 {recentActivity?.criticalAlerts?.map((alt) => (
                   <div
                     key={alt.id}
-                    className="p-2.5 rounded-lg border border-zinc-200/70 bg-zinc-50/50 flex items-center justify-between text-xs"
+                    className="p-2.5 rounded-lg border border-slate-200/70 bg-slate-50/50 flex items-center justify-between text-xs"
                   >
                     <div className="truncate mr-2">
-                      <p className="font-semibold text-zinc-900 truncate">{alt.product_name}</p>
-                      <p className="text-[11px] text-zinc-500">
-                        {alt.warehouse_name} • Current: <span className="font-bold text-zinc-800">{alt.current_quantity}</span> (Min: {alt.minimum_stock})
+                      <p className="font-semibold text-slate-900 truncate">{alt.product_name}</p>
+                      <p className="text-[11px] text-slate-500">
+                        {alt.warehouse_name} • Current: <span className="font-bold text-slate-800">{alt.current_quantity}</span> (Min: {alt.minimum_stock})
                       </p>
                     </div>
                     <div className="shrink-0">
@@ -288,7 +288,7 @@ export default function DashboardPage() {
         title="Recent Stock Movements (Audit Trail)"
         subtitle="Latest 8 inventory transactions recorded with user attribution"
         action={
-          <Link to="/history" className="text-xs text-forest-800 font-medium hover:underline flex items-center gap-1">
+          <Link to="/history" className="text-xs text-brand-600 font-medium hover:text-brand-700 flex items-center gap-1">
             <span>Full Audit Log</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>

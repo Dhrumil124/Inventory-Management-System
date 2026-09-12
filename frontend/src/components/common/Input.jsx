@@ -21,13 +21,13 @@ export default function Input({
   return (
     <div className="w-full">
       {label && (
-        <label htmlFor={inputId} className="block text-xs font-semibold uppercase tracking-wider text-zinc-600 mb-1.5">
+        <label htmlFor={inputId} className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
           {label} {required && <span className="text-rose-600 font-bold">*</span>}
         </label>
       )}
       <div className="relative">
         {Icon && (
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
             <Icon className="h-4 w-4" />
           </div>
         )}
@@ -40,18 +40,18 @@ export default function Input({
           placeholder={placeholder}
           disabled={disabled}
           required={required}
-          className={`w-full rounded-lg border bg-white px-3.5 py-2 text-sm text-zinc-900 transition-colors placeholder:text-zinc-400 disabled:bg-zinc-50 disabled:text-zinc-500 focus:outline-none focus:ring-2 ${
+          className={`w-full rounded-lg border bg-white px-3.5 py-2 text-sm text-slate-900 transition-colors placeholder:text-slate-400 disabled:bg-slate-50 disabled:text-slate-500 focus:outline-none focus:ring-2 ${
             Icon ? 'pl-9' : ''
           } ${
             error
               ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-200'
-              : 'border-zinc-300 focus:border-forest-700 focus:ring-forest-700/20'
+              : 'border-slate-300/90 focus:border-brand-600 focus:ring-brand-500/20 shadow-2xs'
           } ${className}`}
           {...props}
         />
       </div>
       {error && <p className="mt-1.5 text-xs text-rose-600 font-medium">{error}</p>}
-      {helperText && !error && <p className="mt-1.5 text-xs text-zinc-500">{helperText}</p>}
+      {helperText && !error && <p className="mt-1.5 text-xs text-slate-500">{helperText}</p>}
     </div>
   );
 }

@@ -202,11 +202,11 @@ export default function TransfersPage() {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight flex items-center gap-2">
-          <ArrowLeftRight className="w-6 h-6 text-forest-700" />
+        <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <ArrowLeftRight className="w-6 h-6 text-brand-600" />
           <span>Inter-Warehouse Stock Transfer</span>
         </h1>
-        <p className="text-xs text-zinc-500 mt-1">
+        <p className="text-xs text-slate-500 mt-1">
           Safely balance regional stock between distribution nodes with atomic dual-lock database transactions.
         </p>
       </div>
@@ -368,7 +368,7 @@ export default function TransfersPage() {
                 value={form.reason}
                 onChange={(e) => setForm({ ...form, reason: e.target.value })}
                 placeholder="e.g. Regional demand balancing for upcoming delivery commitments..."
-                className="w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-forest-700/20 focus:border-forest-700"
+                className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600"
                 required
               />
             </div>

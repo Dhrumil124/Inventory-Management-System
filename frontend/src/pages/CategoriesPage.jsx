@@ -124,7 +124,7 @@ export default function CategoriesPage() {
       accessor: 'name',
       render: (c) => (
         <div className="flex items-center gap-2">
-          <Layers className="w-4 h-4 text-forest-700 shrink-0" />
+          <Layers className="w-4 h-4 text-accent-600 shrink-0" />
           <span className="font-semibold text-zinc-900">{c.name}</span>
         </div>
       ),
@@ -230,7 +230,7 @@ export default function CategoriesPage() {
               value={addForm.description}
               onChange={(e) => setAddForm({ ...addForm, description: e.target.value })}
               placeholder="Scope and purpose of this product group..."
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-forest-700/20 focus:border-forest-700"
+              className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-colors"
             />
           </div>
 
@@ -271,7 +271,7 @@ export default function CategoriesPage() {
               rows="3"
               value={editForm.description}
               onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2 text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-forest-700/20 focus:border-forest-700"
+              className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-colors"
             />
           </div>
 

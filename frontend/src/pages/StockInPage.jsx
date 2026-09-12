@@ -142,11 +142,11 @@ export default function StockInPage() {
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight flex items-center gap-2">
-          <ArrowDownRight className="w-6 h-6 text-forest-700" />
+        <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <ArrowDownRight className="w-6 h-6 text-emerald-600" />
           <span>Stock In Intake</span>
         </h1>
-        <p className="text-xs text-zinc-500 mt-1">
+        <p className="text-xs text-slate-500 mt-1">
           Receive purchase orders, supplier shipments, and incoming stock into an authorized facility.
         </p>
       </div>
@@ -261,7 +261,7 @@ export default function StockInPage() {
                 value={form.reason}
                 onChange={(e) => setForm({ ...form, reason: e.target.value })}
                 placeholder="e.g. Vendor shipment received against purchase order, passed visual inspection..."
-                className="w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-forest-700/20 focus:border-forest-700"
+                className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600"
                 required
               />
             </div>

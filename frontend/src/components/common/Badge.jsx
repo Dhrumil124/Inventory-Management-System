@@ -3,28 +3,28 @@ import React from 'react';
 export default function Badge({ children, variant = 'default', size = 'md', className = '' }) {
   const variants = {
     // Inventory Statuses
-    in_stock: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-    low_stock: 'bg-amber-50 text-amber-800 border-amber-200',
-    out_of_stock: 'bg-rose-50 text-rose-800 border-rose-200',
+    in_stock: 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
+    low_stock: 'bg-amber-50 text-amber-700 border-amber-200/80',
+    out_of_stock: 'bg-rose-50 text-rose-700 border-rose-200/80',
     
     // Entity Statuses
-    active: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-    inactive: 'bg-zinc-100 text-zinc-600 border-zinc-200',
+    active: 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
+    inactive: 'bg-slate-100 text-slate-600 border-slate-200/80',
     
     // Roles
-    admin: 'bg-purple-50 text-purple-800 border-purple-200',
-    manager: 'bg-blue-50 text-blue-800 border-blue-200',
-    staff: 'bg-teal-50 text-teal-800 border-teal-200',
+    admin: 'bg-accent-50 text-accent-700 border-accent-200/80',
+    manager: 'bg-brand-50 text-brand-700 border-brand-200/80',
+    staff: 'bg-slate-100 text-slate-700 border-slate-200/80',
     
     // Movement Types
-    in: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-    out: 'bg-orange-50 text-orange-800 border-orange-200',
-    transfer_in: 'bg-sky-50 text-sky-800 border-sky-200',
-    transfer_out: 'bg-indigo-50 text-indigo-800 border-indigo-200',
-    adjustment: 'bg-amber-50 text-amber-800 border-amber-200',
+    in: 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
+    out: 'bg-amber-50 text-amber-700 border-amber-200/80',
+    transfer_in: 'bg-brand-50 text-brand-700 border-brand-200/80',
+    transfer_out: 'bg-accent-50 text-accent-700 border-accent-200/80',
+    adjustment: 'bg-sky-50 text-sky-700 border-sky-200/80',
 
     // Generic
-    default: 'bg-zinc-100 text-zinc-700 border-zinc-200',
+    default: 'bg-slate-100 text-slate-700 border-slate-200/80',
   };
 
   const sizes = {

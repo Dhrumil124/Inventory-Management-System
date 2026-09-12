@@ -6,6 +6,11 @@
   html {
     color-scheme: light;
   }
+
+  body {
+    @apply bg-slate-50 text-slate-800 antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
   
   /* Refined custom scrollbar */
   ::-webkit-scrollbar {
@@ -13,7 +18,7 @@
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #f4f5f7;
+    background: #f8fafc;
   }
   ::-webkit-scrollbar-thumb {
     background: #cbd5e1;
@@ -25,8 +30,8 @@
 }
 
 @layer components {
-  /* Subtle focus ring style across inputs and buttons */
+  /* Clean subtle focus ring style across inputs and buttons */
   .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-forest-700/20 focus:border-forest-700;
+    @apply focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600;
   }
 }

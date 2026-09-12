@@ -450,9 +450,9 @@ export default function UsersPage() {
                           : addForm.warehouseIds.filter((id) => id !== idStr);
                         setAddForm({ ...addForm, warehouseIds: updated });
                       }}
-                      className="rounded text-forest-800 focus:ring-forest-700"
+                      className="rounded text-brand-600 focus:ring-brand-500"
                     />
-                    <span className="text-zinc-700 font-medium">{w.name} ({w.code})</span>
+                    <span className="text-slate-700 font-medium">{w.name} ({w.code})</span>
                   </label>
                 ))}
               </div>
@@ -554,10 +554,10 @@ export default function UsersPage() {
                     className="p-2.5 rounded-lg border border-zinc-200/80 bg-white flex items-center justify-between"
                   >
                     <div className="flex items-center gap-2">
-                      <Building2 className="w-4 h-4 text-forest-800" />
+                      <Building2 className="w-4 h-4 text-brand-600" />
                       <div>
-                        <span className="font-semibold text-zinc-900 block">{wh.name}</span>
-                        <span className="font-mono text-[10px] text-zinc-400 uppercase">{wh.code} • {wh.city}</span>
+                        <span className="font-semibold text-slate-900 block">{wh.name}</span>
+                        <span className="font-mono text-[10px] text-slate-400 uppercase">{wh.code} • {wh.city}</span>
                       </div>
                     </div>
                     <Button

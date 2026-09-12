@@ -162,34 +162,34 @@ export default function WarehouseDetailPage() {
       <Card title="Facility Location & Contact Information">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs text-zinc-700">
           <div className="flex items-start gap-2.5">
-            <MapPin className="w-4 h-4 text-forest-700 shrink-0 mt-0.5" />
+            <MapPin className="w-4 h-4 text-brand-600 shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-zinc-900">Address</p>
-              <p className="text-zinc-500 mt-0.5">{warehouse.address}, {warehouse.city}, {warehouse.state} - {warehouse.pincode}</p>
+              <p className="font-semibold text-slate-900">Address</p>
+              <p className="text-slate-500 mt-0.5">{warehouse.address}, {warehouse.city}, {warehouse.state} - {warehouse.pincode}</p>
             </div>
           </div>
 
           <div className="flex items-start gap-2.5">
-            <User className="w-4 h-4 text-forest-700 shrink-0 mt-0.5" />
+            <User className="w-4 h-4 text-brand-600 shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-zinc-900">Contact Person</p>
-              <p className="text-zinc-500 mt-0.5">{warehouse.contact_person || 'Not specified'}</p>
+              <p className="font-semibold text-slate-900">Contact Person</p>
+              <p className="text-slate-500 mt-0.5">{warehouse.contact_person || 'Not specified'}</p>
             </div>
           </div>
 
           <div className="flex items-start gap-2.5">
-            <Phone className="w-4 h-4 text-forest-700 shrink-0 mt-0.5" />
+            <Phone className="w-4 h-4 text-brand-600 shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-zinc-900">Phone</p>
-              <p className="text-zinc-500 mt-0.5">{warehouse.phone || 'Not specified'}</p>
+              <p className="font-semibold text-slate-900">Phone</p>
+              <p className="text-slate-500 mt-0.5">{warehouse.phone || 'Not specified'}</p>
             </div>
           </div>
 
           <div className="flex items-start gap-2.5">
-            <Mail className="w-4 h-4 text-forest-700 shrink-0 mt-0.5" />
+            <Mail className="w-4 h-4 text-brand-600 shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-zinc-900">Email</p>
-              <p className="text-zinc-500 mt-0.5">{warehouse.email || 'Not specified'}</p>
+              <p className="font-semibold text-slate-900">Email</p>
+              <p className="text-slate-500 mt-0.5">{warehouse.email || 'Not specified'}</p>
             </div>
           </div>
         </div>

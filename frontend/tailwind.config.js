@@ -7,25 +7,42 @@ export default {
   theme: {
     extend: {
       colors: {
-        forest: {
-          50: '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
-          500: '#22c55e',
-          600: '#16a34a',
-          700: '#2d6a4f',
-          800: '#1b4332',
-          900: '#143728',
-          950: '#081c14'
+        brand: {
+          50: '#eef2ff',
+          100: '#e0e7ff',
+          200: '#c7d2fe',
+          300: '#a5b4fc',
+          400: '#818cf8',
+          500: '#6366f1',
+          600: '#4f46e5',
+          700: '#4338ca',
+          800: '#3730a3',
+          900: '#312e81',
+          950: '#1e1b4b',
+        },
+        accent: {
+          50: '#f5f3ff',
+          100: '#ede9fe',
+          200: '#ddd6fe',
+          300: '#c4b5fd',
+          400: '#a78bfa',
+          500: '#8b5cf6',
+          600: '#7c3aed',
+          700: '#6d28d9',
+          800: '#5b21b6',
+          900: '#4c1d95',
+        },
+        obsidian: {
+          800: '#111827',
+          900: '#0b0f19',
+          950: '#070a10',
         },
         surface: {
-          subtle: '#f8f9fa',
-          muted: '#f1f3f5',
-          border: '#e4e7eb',
-          charcoal: '#181a1f'
-        }
+          subtle: '#f8fafc',
+          muted: '#f1f5f9',
+          border: '#e2e8f0',
+          charcoal: '#0f172a',
+        },
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],

@@ -51,30 +51,30 @@ export default function AppLayout() {
   ];
 
   return (
-    <div className="h-screen bg-zinc-50 flex overflow-hidden">
+    <div className="h-screen bg-slate-50 flex overflow-hidden">
       {/* ========================================================================= */}
-      {/* DESKTOP SIDEBAR (STATIC / FIXED) */}
+      {/* DESKTOP SIDEBAR (STATIC / FIXED DARK CONTRAST OBSIDIAN) */}
       {/* ========================================================================= */}
-      <aside className="hidden lg:flex lg:flex-col w-64 bg-white border-r border-zinc-200/90 shrink-0 h-full select-none">
+      <aside className="hidden lg:flex lg:flex-col w-64 bg-[#0b0f19] border-r border-slate-800/80 shrink-0 h-full select-none text-slate-300">
         {/* Brand Header */}
-        <div className="h-16 flex items-center px-6 border-b border-zinc-100 gap-3">
-          <div className="w-9 h-9 rounded-xl bg-forest-900 text-white flex items-center justify-center shadow-xs">
-            <Boxes className="w-5 h-5 text-forest-300" />
+        <div className="h-16 flex items-center px-5 border-b border-slate-800/80 gap-3">
+          <div className="w-9 h-9 rounded-lg bg-brand-600 text-white flex items-center justify-center shadow-xs border border-brand-500/30">
+            <Boxes className="w-5 h-5 text-white" />
           </div>
           <div>
-            <span className="font-bold text-zinc-900 text-sm tracking-tight block">Inventory Hub</span>
-            <span className="text-[10px] uppercase font-semibold tracking-wider text-zinc-400">Multi-Warehouse</span>
+            <span className="font-bold text-white text-sm tracking-tight block">Inventory Hub</span>
+            <span className="text-[10px] uppercase font-semibold tracking-wider text-slate-400">Multi-Warehouse</span>
           </div>
         </div>
 
         {/* User Scope Banner in Sidebar */}
-        <div className="px-4 py-3 bg-zinc-50/70 border-b border-zinc-100">
+        <div className="px-4 py-3 bg-slate-900/50 border-b border-slate-800/60">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-zinc-500 font-medium">Assigned Scope</span>
+            <span className="text-slate-400 font-medium">Assigned Scope</span>
             <Badge variant={user?.role}>{user?.role}</Badge>
           </div>
-          <div className="mt-1 text-xs text-zinc-700 font-medium flex items-center gap-1.5 truncate">
-            <Building2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+          <div className="mt-1 text-xs text-slate-300 font-medium flex items-center gap-1.5 truncate">
+            <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
             <span className="truncate">
               {user?.role === 'ADMIN'
                 ? 'All Warehouses (Global)'
@@ -96,8 +96,8 @@ export default function AppLayout() {
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-colors ${
                     isActive
-                      ? 'bg-forest-50 text-forest-900 font-semibold shadow-2xs'
-                      : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100/70'
+                      ? 'bg-brand-600 text-white font-semibold shadow-xs'
+                      : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
                   }`
                 }
               >
@@ -109,18 +109,18 @@ export default function AppLayout() {
         </nav>
 
         {/* Bottom Profile info */}
-        <div className="p-3 border-t border-zinc-100">
-          <div className="flex items-center justify-between p-2 rounded-lg bg-zinc-50 border border-zinc-200/60">
+        <div className="p-3 border-t border-slate-800/80">
+          <div className="flex items-center justify-between p-2.5 rounded-lg bg-slate-900/60 border border-slate-800/80">
             <div className="truncate mr-2">
-              <p className="text-xs font-semibold text-zinc-900 truncate">
+              <p className="text-xs font-semibold text-slate-200 truncate">
                 {user?.firstName} {user?.lastName}
               </p>
-              <p className="text-[11px] text-zinc-500 truncate">{user?.email}</p>
+              <p className="text-[11px] text-slate-400 truncate">{user?.email}</p>
             </div>
             <button
               onClick={handleLogout}
               title="Log out"
-              className="p-1.5 text-zinc-400 hover:text-rose-600 hover:bg-rose-50 rounded-md transition-colors"
+              className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-md transition-colors"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -134,20 +134,20 @@ export default function AppLayout() {
       {mobileDrawerOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
           <div
-            className="fixed inset-0 bg-zinc-900/40 backdrop-blur-xs"
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs"
             onClick={() => setMobileDrawerOpen(false)}
           />
-          <div className="relative w-72 max-w-[80%] bg-white h-full flex flex-col z-10 shadow-dropdown">
-            <div className="h-16 flex items-center justify-between px-5 border-b border-zinc-100">
+          <div className="relative w-72 max-w-[80%] bg-[#0b0f19] text-slate-300 h-full flex flex-col z-10 shadow-dropdown border-r border-slate-800/80">
+            <div className="h-16 flex items-center justify-between px-5 border-b border-slate-800/80">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-forest-900 text-white flex items-center justify-center">
-                  <Boxes className="w-4 h-4 text-forest-300" />
+                <div className="w-8 h-8 rounded-lg bg-brand-600 text-white flex items-center justify-center shadow-xs">
+                  <Boxes className="w-4 h-4 text-white" />
                 </div>
-                <span className="font-bold text-zinc-900 text-sm">Inventory Hub</span>
+                <span className="font-bold text-white text-sm">Inventory Hub</span>
               </div>
               <button
                 onClick={() => setMobileDrawerOpen(false)}
-                className="p-1 text-zinc-400 hover:text-zinc-700"
+                className="p-1.5 text-slate-400 hover:text-white rounded-md transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -164,8 +164,8 @@ export default function AppLayout() {
                     className={({ isActive }) =>
                       `flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-medium transition-colors ${
                         isActive
-                          ? 'bg-forest-50 text-forest-900 font-semibold'
-                          : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'
+                          ? 'bg-brand-600 text-white font-semibold shadow-xs'
+                          : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
                       }`
                     }
                   >
@@ -176,10 +176,10 @@ export default function AppLayout() {
               })}
             </nav>
 
-            <div className="p-4 border-t border-zinc-100">
+            <div className="p-4 border-t border-slate-800/80">
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg border border-rose-200 transition-colors"
+                className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold text-rose-300 bg-rose-950/40 hover:bg-rose-900/40 rounded-lg border border-rose-800/50 transition-colors"
               >
                 <LogOut className="w-4 h-4" />
                 <span>Log out</span>
@@ -194,16 +194,16 @@ export default function AppLayout() {
       {/* ========================================================================= */}
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
         {/* Top Header (Static) */}
-        <header className="h-16 bg-white border-b border-zinc-200/80 px-4 sm:px-6 flex items-center justify-between shrink-0 z-20">
+        <header className="h-16 bg-white border-b border-slate-200/80 px-4 sm:px-6 flex items-center justify-between shrink-0 z-20">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileDrawerOpen(true)}
-              className="lg:hidden p-2 text-zinc-600 hover:text-zinc-900 rounded-lg hover:bg-zinc-100"
+              className="lg:hidden p-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100"
             >
               <Menu className="w-5 h-5" />
             </button>
             <div className="hidden sm:block">
-              <span className="text-xs text-zinc-400 font-medium">Enterprise Inventory Management</span>
+              <span className="text-xs text-slate-400 font-medium">Enterprise Inventory Management</span>
             </div>
           </div>
 
@@ -212,18 +212,18 @@ export default function AppLayout() {
             <div className="relative">
               <button
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-zinc-50 border border-transparent hover:border-zinc-200 transition-colors focus:outline-none"
+                className="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-colors focus:outline-none"
               >
-                <div className="w-7 h-7 rounded-full bg-forest-100 text-forest-900 flex items-center justify-center font-bold text-xs">
+                <div className="w-7 h-7 rounded-full bg-brand-50 text-brand-700 border border-brand-200/80 flex items-center justify-center font-bold text-xs">
                   {user?.firstName?.[0]}
                 </div>
                 <div className="text-left hidden md:block">
-                  <p className="text-xs font-semibold text-zinc-800 leading-tight">
+                  <p className="text-xs font-semibold text-slate-800 leading-tight">
                     {user?.firstName} {user?.lastName}
                   </p>
-                  <p className="text-[10px] text-zinc-400 leading-tight uppercase font-bold">{user?.role}</p>
+                  <p className="text-[10px] text-slate-400 leading-tight uppercase font-bold tracking-wider">{user?.role}</p>
                 </div>
-                <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
               </button>
 
               {userDropdownOpen && (
@@ -232,18 +232,18 @@ export default function AppLayout() {
                     className="fixed inset-0 z-30"
                     onClick={() => setUserDropdownOpen(false)}
                   />
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl border border-zinc-200 shadow-dropdown z-40 py-1.5 text-xs text-zinc-700">
-                    <div className="px-3.5 py-2 border-b border-zinc-100">
-                      <p className="font-semibold text-zinc-900">{user?.firstName} {user?.lastName}</p>
-                      <p className="text-zinc-400 text-[11px] truncate">{user?.email}</p>
-                      <div className="mt-1.5">
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl border border-slate-200 shadow-dropdown z-40 py-1.5 text-xs text-slate-700">
+                    <div className="px-3.5 py-2.5 border-b border-slate-100">
+                      <p className="font-semibold text-slate-900">{user?.firstName} {user?.lastName}</p>
+                      <p className="text-slate-400 text-[11px] truncate">{user?.email}</p>
+                      <div className="mt-2">
                         <Badge variant={user?.role}>{user?.role}</Badge>
                       </div>
                     </div>
                     <NavLink
                       to="/settings"
                       onClick={() => setUserDropdownOpen(false)}
-                      className="block px-3.5 py-2 hover:bg-zinc-50 text-zinc-700 font-medium"
+                      className="block px-3.5 py-2 hover:bg-slate-50 text-slate-700 font-medium"
                     >
                       Account & Security Settings
                     </NavLink>

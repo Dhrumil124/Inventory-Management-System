@@ -137,7 +137,7 @@ export default function ProductDetailPage() {
         <div className="bg-white p-4 rounded-xl border border-zinc-200/80 shadow-xs">
           <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">Category</span>
           <span className="text-sm font-semibold text-zinc-800 mt-1 flex items-center gap-1.5">
-            <Layers className="w-4 h-4 text-forest-700" />
+            <Layers className="w-4 h-4 text-accent-600" />
             <span>{product.category_name}</span>
           </span>
         </div>
@@ -145,7 +145,7 @@ export default function ProductDetailPage() {
         <div className="bg-white p-4 rounded-xl border border-zinc-200/80 shadow-xs">
           <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">Unit Price</span>
           <span className="text-sm font-semibold font-mono text-zinc-900 mt-1 flex items-center gap-1.5">
-            <IndianRupee className="w-4 h-4 text-forest-700" />
+            <IndianRupee className="w-4 h-4 text-brand-600" />
             <span>{formatCurrency(product.price)}</span>
           </span>
         </div>

@@ -435,7 +435,7 @@ export default function ProductsPage() {
               value={addForm.description}
               onChange={(e) => setAddForm({ ...addForm, description: e.target.value })}
               placeholder="Detailed technical specifications, warranty, or handling guidelines..."
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-forest-700/20 focus:border-forest-700"
+              className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-colors"
             />
           </div>
 

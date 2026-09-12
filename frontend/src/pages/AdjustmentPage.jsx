@@ -137,11 +137,11 @@ export default function AdjustmentPage() {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight flex items-center gap-2">
-          <SlidersHorizontal className="w-6 h-6 text-amber-700" />
+        <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <SlidersHorizontal className="w-6 h-6 text-sky-600" />
           <span>Physical Stock Adjustment</span>
         </h1>
-        <p className="text-xs text-zinc-500 mt-1">
+        <p className="text-xs text-slate-500 mt-1">
           Reconcile system records with physical cycle counts. Creates an auditable adjustment movement.
         </p>
       </div>
@@ -253,7 +253,7 @@ export default function AdjustmentPage() {
                 value={form.reason}
                 onChange={(e) => setForm({ ...form, reason: e.target.value })}
                 placeholder="e.g. Discrepancy identified during quarterly warehouse audit; 2 items damaged in transit..."
-                className="w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-forest-700/20 focus:border-forest-700"
+                className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600"
                 required
               />
             </div>

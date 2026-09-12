@@ -20,7 +20,7 @@ export default function Select({
   return (
     <div className="w-full">
       {label && (
-        <label htmlFor={selectId} className="block text-xs font-semibold uppercase tracking-wider text-zinc-600 mb-1.5">
+        <label htmlFor={selectId} className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
           {label} {required && <span className="text-rose-600 font-bold">*</span>}
         </label>
       )}
@@ -31,10 +31,10 @@ export default function Select({
         onChange={onChange}
         disabled={disabled}
         required={required}
-        className={`w-full rounded-lg border bg-white px-3.5 py-2 text-sm text-zinc-900 transition-colors disabled:bg-zinc-50 disabled:text-zinc-500 focus:outline-none focus:ring-2 ${
+        className={`w-full rounded-lg border bg-white px-3.5 py-2 text-sm text-slate-900 transition-colors disabled:bg-slate-50 disabled:text-slate-500 focus:outline-none focus:ring-2 ${
           error
             ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-200'
-            : 'border-zinc-300 focus:border-forest-700 focus:ring-forest-700/20'
+            : 'border-slate-300/90 focus:border-brand-600 focus:ring-brand-500/20 shadow-2xs'
         } ${className}`}
         {...props}
       >
@@ -50,7 +50,7 @@ export default function Select({
         ))}
       </select>
       {error && <p className="mt-1.5 text-xs text-rose-600 font-medium">{error}</p>}
-      {helperText && !error && <p className="mt-1.5 text-xs text-zinc-500">{helperText}</p>}
+      {helperText && !error && <p className="mt-1.5 text-xs text-slate-500">{helperText}</p>}
     </div>
   );
 }

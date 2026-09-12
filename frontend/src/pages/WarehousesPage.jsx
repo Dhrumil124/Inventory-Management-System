@@ -143,10 +143,10 @@ export default function WarehousesPage() {
       accessor: 'name',
       render: (wh) => (
         <div className="flex items-center gap-2">
-          <Warehouse className="w-4 h-4 text-forest-800 shrink-0" />
+          <Warehouse className="w-4 h-4 text-brand-600 shrink-0" />
           <div>
-            <span className="font-semibold text-zinc-900 block">{wh.name}</span>
-            <span className="text-[11px] text-zinc-400">{wh.city}, {wh.state}</span>
+            <span className="font-semibold text-slate-900 block">{wh.name}</span>
+            <span className="text-[11px] text-slate-400">{wh.city}, {wh.state}</span>
           </div>
         </div>
       ),

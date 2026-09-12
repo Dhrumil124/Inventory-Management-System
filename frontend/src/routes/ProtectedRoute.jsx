@@ -10,10 +10,10 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-50">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-forest-800 mx-auto mb-2" />
-          <p className="text-xs text-zinc-500 font-medium tracking-wide">Authenticating session...</p>
+          <Loader2 className="w-8 h-8 animate-spin text-brand-600 mx-auto mb-2" />
+          <p className="text-xs text-slate-500 font-medium tracking-wide">Authenticating session...</p>
         </div>
       </div>
     );
@@ -26,13 +26,13 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
   if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center p-6 text-center">
-        <div className="max-w-md bg-white p-8 rounded-2xl border border-zinc-200/90 shadow-card">
+        <div className="max-w-md bg-white p-8 rounded-2xl border border-slate-200/90 shadow-card">
           <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-4">
             <ShieldAlert className="w-6 h-6" />
           </div>
-          <h2 className="text-lg font-bold text-zinc-900 tracking-tight">Access Restricted (403)</h2>
-          <p className="mt-2 text-xs text-zinc-500 leading-relaxed">
-            Your role (<strong className="text-zinc-800">{user?.role}</strong>) does not have sufficient administrative permissions to view this resource.
+          <h2 className="text-lg font-bold text-slate-900 tracking-tight">Access Restricted (403)</h2>
+          <p className="mt-2 text-xs text-slate-500 leading-relaxed">
+            Your role (<strong className="text-slate-800">{user?.role}</strong>) does not have sufficient administrative permissions to view this resource.
           </p>
           <div className="mt-6">
             <Button variant="outline" onClick={() => window.history.back()}>

@@ -189,7 +189,7 @@ export default function HistoryPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight flex items-center gap-2">
-            <History className="w-6 h-6 text-forest-800" />
+            <History className="w-6 h-6 text-brand-600" />
             <span>Inventory Audit Trail</span>
           </h1>
           <p className="text-xs text-zinc-500 mt-1">
@@ -254,7 +254,7 @@ export default function HistoryPage() {
                   setStartDate(e.target.value);
                   setPage(1);
                 }}
-                className="w-full rounded-lg border border-zinc-300 bg-white px-2.5 py-2 text-xs text-zinc-800 focus:outline-none focus:ring-2 focus:ring-forest-700/20 focus:border-forest-700"
+                className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-colors"
                 title="From Date"
               />
             </div>
@@ -267,7 +267,7 @@ export default function HistoryPage() {
                   setEndDate(e.target.value);
                   setPage(1);
                 }}
-                className="w-full rounded-lg border border-zinc-300 bg-white px-2.5 py-2 text-xs text-zinc-800 focus:outline-none focus:ring-2 focus:ring-forest-700/20 focus:border-forest-700"
+                className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition-colors"
                 title="To Date"
               />
             </div>
