@@ -44,7 +44,12 @@ export default function TransfersPage() {
           api.get('/products?limit=100'),
           api.get('/inventory/history?movementType=TRANSFER_OUT&limit=5'),
         ]);
-        if (whRes.data.success) setWarehouses(whRes.data.data);
+        if (whRes.data.success) {
+          setWarehouses(whRes.data.data);
+          if (whRes.data.data.length === 1 && !searchParams.get('sourceWarehouseId')) {
+            setForm((prev) => ({ ...prev, sourceWarehouseId: String(whRes.data.data[0].id) }));
+          }
+        }
         if (destWhRes.data.success) setDestinationWarehouses(destWhRes.data.data);
         if (prodRes.data.success) setProducts(prodRes.data.data);
         if (histRes.data.success) setRecentTransfers(histRes.data.data);
@@ -274,7 +279,14 @@ export default function TransfersPage() {
               <Select
                 label="Source Warehouse (Origin)"
                 value={form.sourceWarehouseId}
-                onChange={(e) => setForm({ ...form, sourceWarehouseId: e.target.value })}
+                onChange={(e) => {
+                  const newSource = e.target.value;
+                  setForm((prev) => ({
+                    ...prev,
+                    sourceWarehouseId: newSource,
+                    destinationWarehouseId: prev.destinationWarehouseId === newSource ? '' : prev.destinationWarehouseId,
+                  }));
+                }}
                 options={warehouses.map((w) => ({ value: String(w.id), label: `${w.name} (${w.code})` }))}
                 placeholder="Select Source Facility"
                 helperText="Facility where stock currently exists"
