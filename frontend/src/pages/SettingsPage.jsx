@@ -62,29 +62,31 @@ export default function SettingsPage() {
 
       {/* User Profile Summary */}
       <Card title="Corporate Profile">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-          <div>
-            <span className="text-zinc-400 font-semibold uppercase tracking-wider block">Full Name</span>
-            <span className="font-semibold text-zinc-900 text-sm mt-0.5 block">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-xs">
+          <div className="min-w-0">
+            <span className="text-zinc-400 font-semibold uppercase tracking-wider block text-[11px]">Full Name</span>
+            <span className="font-semibold text-zinc-900 text-sm mt-1 block truncate">
               {user?.firstName} {user?.lastName}
             </span>
           </div>
 
-          <div>
-            <span className="text-zinc-400 font-semibold uppercase tracking-wider block">Email Address</span>
-            <span className="font-medium text-zinc-800 text-sm mt-0.5 block">{user?.email}</span>
+          <div className="min-w-0">
+            <span className="text-zinc-400 font-semibold uppercase tracking-wider block text-[11px]">Email Address</span>
+            <span className="font-medium text-zinc-800 text-sm mt-1 block truncate" title={user?.email}>
+              {user?.email}
+            </span>
           </div>
 
-          <div>
-            <span className="text-zinc-400 font-semibold uppercase tracking-wider block">Role Authorization</span>
-            <div className="mt-1">
+          <div className="min-w-0">
+            <span className="text-zinc-400 font-semibold uppercase tracking-wider block text-[11px]">Role Authorization</span>
+            <div className="mt-1.5 flex items-center">
               <Badge variant={user?.role}>{user?.role}</Badge>
             </div>
           </div>
 
-          <div>
-            <span className="text-zinc-400 font-semibold uppercase tracking-wider block">Authorized Scope</span>
-            <div className="mt-1 text-zinc-700 font-medium flex items-center gap-1.5">
+          <div className="min-w-0">
+            <span className="text-zinc-400 font-semibold uppercase tracking-wider block text-[11px]">Authorized Scope</span>
+            <div className="mt-1.5 text-zinc-700 font-medium flex items-center gap-1.5 truncate">
               <Building2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
               <span className="truncate">
                 {user?.role === 'ADMIN'
