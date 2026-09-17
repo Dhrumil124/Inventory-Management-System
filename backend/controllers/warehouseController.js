@@ -8,7 +8,7 @@ class WarehouseController {
       let query;
       let params = [];
 
-      if (req.user.role === ROLES.ADMIN || req.query.all === 'true') {
+      if (req.user.role === ROLES.ADMIN) {
         query = `
           SELECT w.*,
             (SELECT COUNT(DISTINCT i.product_id) FROM inventory i WHERE i.warehouse_id = w.id AND i.quantity > 0) AS total_active_skus,
@@ -20,7 +20,7 @@ class WarehouseController {
           ORDER BY w.name ASC
         `;
       } else {
-        if (req.user.assignedWarehouseIds.length === 0) {
+        if (!req.user.assignedWarehouseIds || req.user.assignedWarehouseIds.length === 0) {
           return successResponse(res, [], 'No warehouses assigned to current user.');
         }
         const placeholders = req.user.assignedWarehouseIds.map(() => '?').join(',');
@@ -60,17 +60,14 @@ class WarehouseController {
 
       const warehouse = rows[0];
 
-      // Summary statistics
+      // Summary statistics (independent subqueries for accuracy)
       const [stats] = await pool.execute(
         `SELECT 
-           COUNT(DISTINCT i.product_id) AS total_products,
-           COALESCE(SUM(i.quantity), 0) AS total_quantity,
-           SUM(CASE WHEN a.alert_type = 'LOW_STOCK' THEN 1 ELSE 0 END) AS low_stock_count,
-           SUM(CASE WHEN a.alert_type = 'OUT_OF_STOCK' THEN 1 ELSE 0 END) AS out_of_stock_count
-         FROM inventory i
-         LEFT JOIN inventory_alerts a ON a.product_id = i.product_id AND a.warehouse_id = i.warehouse_id AND a.status = 'ACTIVE'
-         WHERE i.warehouse_id = ?`,
-        [warehouseId]
+           (SELECT COUNT(DISTINCT product_id) FROM inventory WHERE warehouse_id = ? AND quantity > 0) AS total_products,
+           (SELECT COALESCE(SUM(quantity), 0) FROM inventory WHERE warehouse_id = ?) AS total_quantity,
+           (SELECT COUNT(*) FROM inventory_alerts WHERE warehouse_id = ? AND alert_type = 'LOW_STOCK' AND status = 'ACTIVE') AS low_stock_count,
+           (SELECT COUNT(*) FROM inventory_alerts WHERE warehouse_id = ? AND alert_type = 'OUT_OF_STOCK' AND status = 'ACTIVE') AS out_of_stock_count`,
+        [warehouseId, warehouseId, warehouseId, warehouseId]
       );
 
       // Assigned users list

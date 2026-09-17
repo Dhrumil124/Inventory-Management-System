@@ -44,7 +44,7 @@ async function authenticateToken(req, res, next) {
 
     // Check token version to enforce immediate logout / password-change invalidation
     if (decoded.tokenVersion !== user.token_version) {
-      return errorResponse(res, 'Session revoked. Please log in again.', 401);
+      return errorResponse(res, 'Your session has expired. Please log in again.', 401);
     }
 
     // Load assigned warehouses

@@ -50,7 +50,7 @@ class ProductController {
       let whFilterClause = '';
       let whParams = [];
       if (req.user.role !== ROLES.ADMIN) {
-        if (req.user.assignedWarehouseIds.length === 0) {
+        if (!req.user.assignedWarehouseIds || req.user.assignedWarehouseIds.length === 0) {
           whFilterClause = 'AND i.warehouse_id IN (-1)';
         } else {
           const ph = req.user.assignedWarehouseIds.map(() => '?').join(',');
@@ -59,9 +59,22 @@ class ProductController {
         }
       }
 
+      // Stock status filter at the SQL level before COUNT and pagination
+      const stockSubquery = `COALESCE((SELECT SUM(i.quantity) FROM inventory i WHERE i.product_id = p.id ${whFilterClause}), 0)`;
+      if (stockStatus === 'OUT_OF_STOCK') {
+        whereConditions.push(`${stockSubquery} = 0`);
+        params.push(...whParams);
+      } else if (stockStatus === 'LOW_STOCK') {
+        whereConditions.push(`(${stockSubquery} > 0 AND ${stockSubquery} <= p.minimum_stock)`);
+        params.push(...whParams, ...whParams);
+      } else if (stockStatus === 'IN_STOCK') {
+        whereConditions.push(`${stockSubquery} > p.minimum_stock`);
+        params.push(...whParams);
+      }
+
       const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
 
-      // Count
+      // Count matching records directly from SQL
       const [countRows] = await pool.execute(
         `SELECT COUNT(*) AS total 
          FROM products p 
@@ -71,10 +84,10 @@ class ProductController {
       );
       const total = countRows[0].total;
 
-      // Data query
+      // Data query with exact LIMIT and OFFSET
       const [products] = await pool.execute(
         `SELECT p.*, c.name AS category_name,
-                COALESCE((SELECT SUM(i.quantity) FROM inventory i WHERE i.product_id = p.id ${whFilterClause}), 0) AS total_stock,
+                ${stockSubquery} AS total_stock,
                 (SELECT COUNT(*) FROM inventory_alerts a WHERE a.product_id = p.id AND a.status = 'ACTIVE') AS active_alerts_count
          FROM products p
          JOIN categories c ON p.category_id = c.id
@@ -84,20 +97,7 @@ class ProductController {
         [...whParams, ...params]
       );
 
-      // Client-requested stock status filter (IN_STOCK, LOW_STOCK, OUT_OF_STOCK)
-      let filteredProducts = products;
-      if (stockStatus) {
-        filteredProducts = products.filter(p => {
-          const stock = Number(p.total_stock);
-          const minStock = Number(p.minimum_stock);
-          if (stockStatus === 'OUT_OF_STOCK') return stock === 0;
-          if (stockStatus === 'LOW_STOCK') return stock > 0 && stock <= minStock;
-          if (stockStatus === 'IN_STOCK') return stock > minStock;
-          return true;
-        });
-      }
-
-      return successResponse(res, filteredProducts, 'Products retrieved successfully.', 200, {
+      return successResponse(res, products, 'Products retrieved successfully.', 200, {
         page,
         limit,
         total,

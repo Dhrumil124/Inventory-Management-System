@@ -51,15 +51,18 @@ export default function AppRoutes() {
         <Route path="/inventory" element={<InventoryPage />} />
         <Route path="/stock-in" element={<StockInPage />} />
         <Route path="/stock-out" element={<StockOutPage />} />
-        {/* Transfers: Restricted to Admin and Manager only */}
+        {/* Transfers: Permitted for Admin, Manager, and Staff with assigned facilities */}
         <Route
           path="/transfers"
           element={
-            <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
+            <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER', 'STAFF']}>
               <TransfersPage />
             </ProtectedRoute>
           }
         />
+        
+        {/* Reports Redirect: Stock Matrix is the single destination */}
+        <Route path="/reports" element={<Navigate to="/inventory" replace />} />
         
         {/* Adjustment: Restricted to Admin and Manager only */}
         <Route

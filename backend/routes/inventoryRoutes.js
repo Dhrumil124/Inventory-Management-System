@@ -38,10 +38,10 @@ router.post(
   InventoryController.stockOut
 );
 
-// Stock Transfer (Admin, Manager only; Staff is strictly prohibited)
+// Stock Transfer (Admin, Manager, Staff with dual-assigned warehouses)
 router.post(
   '/transfer',
-  requireRole(ROLES.ADMIN, ROLES.MANAGER),
+  requireRole(ROLES.ADMIN, ROLES.MANAGER, ROLES.STAFF),
   verifyTransferWarehouseAccess(),
   transferValidation,
   validateRequest,

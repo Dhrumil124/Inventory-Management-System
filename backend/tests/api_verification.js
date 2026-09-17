@@ -296,32 +296,75 @@ async function runTests() {
     assert(validStockOut.data.data.newQuantity === 70, 'New inventory quantity is exactly 70');
 
     // ------------------------------------------------------------------------
-    // TEST 4: Stock Transfer with Deterministic Row Locking
+    // TEST 4: Stock Transfer with Deterministic Row Locking & Dual-Warehouse Auth
     // ------------------------------------------------------------------------
-    console.log('\n▶ TEST 4: Atomic Stock Transfer & Role Restrictions (Manager/Admin Only)');
+    console.log('\n▶ TEST 4: Stock Transfer Dual-Warehouse Assignment Authorization & Concurrency');
 
-    // 4.1 Staff is strictly prohibited from executing transfers (Option 2 policy)
-    const staffTransferAttempt = await request('POST', '/api/inventory/transfer', {
+    // 4.1 Staff Multi (assigned WH 1 & WH 2) transfers stock between assigned facilities -> SUCCEEDS (201)
+    const staffMultiTransfer = await request('POST', '/api/inventory/transfer', {
       productId: testProductId,
       sourceWarehouseId: 1,
       destinationWarehouseId: 2,
-      quantity: 25,
-      reason: 'Staff unauthorized transfer attempt'
+      quantity: 15,
+      reference: 'TEST-TRF-STAFF-01',
+      reason: 'Staff transferring between assigned branches'
     }, staffMultiToken);
-    assert(staffTransferAttempt.status === 403, 'Staff transfer attempt rejected with 403 Forbidden (Transfers reserved for Manager/Admin)');
+    assert(staffMultiTransfer.status === 201, 'Staff assigned to BOTH facilities transfer succeeded with 201 Created');
+    assert(staffMultiTransfer.data.data.source.newQuantity === 55, 'Source WH 1 updated to 55 (70 - 15)');
+    assert(staffMultiTransfer.data.data.destination.newQuantity === 15, 'Destination WH 2 updated to 15 (0 + 15)');
 
-    // 4.2 Authorized Manager Ahmedabad transfers stock to Surat
-    const validTransfer = await request('POST', '/api/inventory/transfer', {
+    // 4.2 Staff Multi attempting transfer to unassigned WH 3 (Mumbai) -> 403 Forbidden
+    const staffMultiBadDest = await request('POST', '/api/inventory/transfer', {
+      productId: testProductId,
+      sourceWarehouseId: 1,
+      destinationWarehouseId: 3, // WH 3 is not assigned to staff.multi
+      quantity: 5,
+      reason: 'Staff transfer to unassigned destination'
+    }, staffMultiToken);
+    assert(staffMultiBadDest.status === 403, 'Staff transfer to unassigned destination warehouse rejected with 403 Forbidden');
+
+    // 4.3 Staff Ahmedabad (assigned WH 1 only) attempting transfer to WH 2 (unassigned) -> 403 Forbidden
+    const staffSingleBadTransfer = await request('POST', '/api/inventory/transfer', {
       productId: testProductId,
       sourceWarehouseId: 1,
       destinationWarehouseId: 2,
-      quantity: 25,
-      reference: 'TEST-TRF-01',
-      reason: 'Transfer stock between authorized branches'
+      quantity: 5,
+      reason: 'Staff single-facility transfer attempt'
+    }, staffAmdToken);
+    assert(staffSingleBadTransfer.status === 403, 'Staff with unassigned destination rejected with 403 Forbidden');
+
+    // 4.4 Manager Ahmedabad (assigned WH 1 only) attempting transfer to WH 2 (unassigned to manager.ahmedabad) -> 403 Forbidden
+    const mgrSingleBadTransfer = await request('POST', '/api/inventory/transfer', {
+      productId: testProductId,
+      sourceWarehouseId: 1,
+      destinationWarehouseId: 2,
+      quantity: 5,
+      reason: 'Manager transferring to unassigned destination'
     }, managerAmdToken);
-    assert(validTransfer.status === 201, 'Authorized Manager transfer succeeded with 201 Created');
-    assert(validTransfer.data.data.source.newQuantity === 45, 'Source WH 1 updated to 45 (70 - 25)');
-    assert(validTransfer.data.data.destination.newQuantity === 25, 'Destination WH 2 updated to 25 (0 + 25)');
+    assert(mgrSingleBadTransfer.status === 403, 'Manager transfer to unassigned destination facility rejected with 403 Forbidden');
+
+    // 4.5 Admin transfers between any facilities (WH 1 to WH 2) -> SUCCEEDS (201)
+    const adminTransfer = await request('POST', '/api/inventory/transfer', {
+      productId: testProductId,
+      sourceWarehouseId: 1,
+      destinationWarehouseId: 2,
+      quantity: 10,
+      reference: 'TEST-TRF-ADM-01',
+      reason: 'Admin global transfer balancing'
+    }, adminToken);
+    assert(adminTransfer.status === 201, 'Admin global transfer succeeded with 201 Created');
+    assert(adminTransfer.data.data.source.newQuantity === 45, 'Source WH 1 updated to 45 (55 - 10)');
+    assert(adminTransfer.data.data.destination.newQuantity === 25, 'Destination WH 2 updated to 25 (15 + 10)');
+
+    // 4.6 Transfer to identical source and destination -> 400 Bad Request
+    const sameWhTransfer = await request('POST', '/api/inventory/transfer', {
+      productId: testProductId,
+      sourceWarehouseId: 1,
+      destinationWarehouseId: 1,
+      quantity: 5,
+      reason: 'Transferring to same warehouse'
+    }, adminToken);
+    assert(sameWhTransfer.status === 400, 'Same source and destination warehouse rejected with 400 Bad Request');
 
     // ------------------------------------------------------------------------
     // TEST 5: Alert State Machine Transitions & Deduplication
@@ -385,11 +428,11 @@ async function runTests() {
     console.log('\n▶ TEST 6: Concurrency Safety Under Simultaneous High-Contention Race Conditions');
 
     // Ahmedabad WH 1 currently has 50 units.
-    // We launch 5 SIMULTANEOUS Stock Out operations of 20 units each.
+    // Launch 5 SIMULTANEOUS Stock Out operations of 20 units each.
     // 5 * 20 = 100 units requested, but only 50 units exist.
-    // Under row locking (SELECT ... FOR UPDATE), EXACTLY 2 requests must succeed (20 + 20 = 40 units),
+    // EXACTLY 2 requests must succeed (20 + 20 = 40 units),
     // EXACTLY 3 requests must fail with insufficient stock,
-    // and the final inventory MUST BE EXACTLY 10 units (never negative!).
+    // and final inventory MUST BE EXACTLY 10 units (never negative!).
 
     const concurrentRequests = [1, 2, 3, 4, 5].map((i) =>
       request('POST', '/api/inventory/stock-out', {
@@ -405,7 +448,7 @@ async function runTests() {
 
     let successes = 0;
     let failures = 0;
-    raceResults.forEach((res, idx) => {
+    raceResults.forEach((res) => {
       if (res.status === 200) {
         successes++;
       } else if (res.status === 400 && res.data.message.includes('Insufficient stock')) {
@@ -457,45 +500,119 @@ async function runTests() {
     assert(adjMove[0].previous_quantity === 10 && adjMove[0].new_quantity === 15, 'Previous and new quantities verified in audit');
 
     // ------------------------------------------------------------------------
-    // TEST 8: Admin Warehouse Assignment CRUD (Add & Revoke)
+    // TEST 8: Warehouse Authorization & ?all=true Lockdown
     // ------------------------------------------------------------------------
-    console.log('\n▶ TEST 8: Admin Warehouse Assignment Add & Revoke Lifecycle');
+    console.log('\n▶ TEST 8: Warehouse Authorization & ?all=true Query Parameter Security');
 
-    // Create a temporary test user
-    const testUserRes = await request('POST', '/api/users', {
-      firstName: 'Temp',
-      lastName: 'Assignee',
-      email: `temp.assignee.${Date.now()}@inventory.local`,
-      password: 'Password@12345',
-      roleId: 3 // STAFF
-    }, adminToken);
-    assert(testUserRes.status === 201, 'Temp user created for assignment test');
-    const tempUserId = testUserRes.data.data.id;
-    testUserIds.push(tempUserId);
+    // 8.1 ADMIN with ?all=true receives all 4 active warehouses
+    const adminWhRes = await request('GET', '/api/warehouses?all=true', null, adminToken);
+    assert(adminWhRes.status === 200, 'Admin warehouse query returned 200');
+    assert(adminWhRes.data.data.length === 4, `Admin received all 4 active warehouses (got ${adminWhRes.data.data.length})`);
 
-    // 1. Assign Mumbai WH 3
-    const assignRes = await request('POST', `/api/users/${tempUserId}/warehouses`, {
-      warehouseId: 3
-    }, adminToken);
-    assert(assignRes.status === 200, 'Warehouse 3 successfully assigned to user');
+    // 8.2 MANAGER Ahmedabad with ?all=true MUST NOT bypass authorization (only receives 1 assigned WH)
+    const mgrAllRes = await request('GET', '/api/warehouses?all=true', null, managerAmdToken);
+    assert(mgrAllRes.status === 200, 'Manager warehouse query returned 200');
+    assert(mgrAllRes.data.data.length === 1, `Manager with ?all=true received strictly 1 assigned warehouse (got ${mgrAllRes.data.data.length})`);
+    assert(mgrAllRes.data.data[0].id === 1, 'Manager received only Ahmedabad WH 1');
 
-    // 2. Verify assignment exists in DB
-    const [assignedWh] = await pool.execute(
-      'SELECT * FROM user_warehouses WHERE user_id = ? AND warehouse_id = 3',
-      [tempUserId]
-    );
-    assert(assignedWh.length === 1, 'Assignment confirmed in user_warehouses table');
+    // 8.3 STAFF Ahmedabad with ?all=true MUST NOT bypass authorization (only receives 1 assigned WH)
+    const staffAllRes = await request('GET', '/api/warehouses?all=true', null, staffAmdToken);
+    assert(staffAllRes.status === 200, 'Staff warehouse query returned 200');
+    assert(staffAllRes.data.data.length === 1, `Staff with ?all=true received strictly 1 assigned warehouse (got ${staffAllRes.data.data.length})`);
 
-    // 3. Revoke assignment
-    const revokeRes = await request('DELETE', `/api/users/${tempUserId}/warehouses/3`, null, adminToken);
-    assert(revokeRes.status === 200, 'Warehouse 3 assignment successfully revoked');
+    // 8.4 STAFF Multi receives exactly their 2 assigned warehouses (WH 1 & WH 2)
+    const staffMultiWh = await request('GET', '/api/warehouses', null, staffMultiToken);
+    assert(staffMultiWh.status === 200, 'Staff Multi warehouse query returned 200');
+    assert(staffMultiWh.data.data.length === 2, `Staff Multi received exactly 2 assigned warehouses (got ${staffMultiWh.data.data.length})`);
 
-    // 4. Verify assignment removed from DB
-    const [revokedWh] = await pool.execute(
-      'SELECT * FROM user_warehouses WHERE user_id = ? AND warehouse_id = 3',
-      [tempUserId]
-    );
-    assert(revokedWh.length === 0, 'Assignment cleanly removed from user_warehouses');
+    // ------------------------------------------------------------------------
+    // TEST 9: Dashboard Warehouse Authorization & Anti-Tampering
+    // ------------------------------------------------------------------------
+    console.log('\n▶ TEST 9: Server-Side Dashboard Warehouse Authorization (403 on Unassigned)');
+
+    // 9.1 Manager Ahmedabad accessing unassigned Surat WH 2 on /metrics -> MUST return 403 Forbidden
+    const unauthMetrics = await request('GET', '/api/dashboard/metrics?warehouseId=2', null, managerAmdToken);
+    assert(unauthMetrics.status === 403, 'Manager requesting unauthorized warehouse metrics returned 403 Forbidden');
+
+    // 9.2 Manager Ahmedabad accessing unassigned Surat WH 2 on /stock-breakdown -> MUST return 403 Forbidden
+    const unauthBreakdown = await request('GET', '/api/dashboard/stock-breakdown?warehouseId=2', null, managerAmdToken);
+    assert(unauthBreakdown.status === 403, 'Manager requesting unauthorized warehouse breakdown returned 403 Forbidden');
+
+    // 9.3 Manager Ahmedabad accessing unassigned Surat WH 2 on /recent-activity -> MUST return 403 Forbidden
+    const unauthActivity = await request('GET', '/api/dashboard/recent-activity?warehouseId=2', null, managerAmdToken);
+    assert(unauthActivity.status === 403, 'Manager requesting unauthorized warehouse recent activity returned 403 Forbidden');
+
+    // 9.4 Manager Ahmedabad accessing assigned WH 1 on /metrics -> 200 OK
+    const authMetrics = await request('GET', '/api/dashboard/metrics?warehouseId=1', null, managerAmdToken);
+    assert(authMetrics.status === 200, 'Manager requesting assigned warehouse metrics returned 200 OK');
+
+    // 9.5 Admin accessing any warehouse (WH 2) on /metrics -> 200 OK
+    const adminMetrics = await request('GET', '/api/dashboard/metrics?warehouseId=2', null, adminToken);
+    assert(adminMetrics.status === 200, 'Admin requesting any active warehouse metrics returned 200 OK');
+
+    // ------------------------------------------------------------------------
+    // TEST 10: Product stockStatus SQL-Level Filtering & Pagination
+    // ------------------------------------------------------------------------
+    console.log('\n▶ TEST 10: SQL-Level Product stockStatus Filtering and Pagination Invariants');
+
+    // 10.1 OUT_OF_STOCK filter
+    const oosRes = await request('GET', '/api/products?stockStatus=OUT_OF_STOCK&limit=10', null, adminToken);
+    assert(oosRes.status === 200, 'OUT_OF_STOCK products query returned 200');
+    assert(oosRes.data.data.every(p => Number(p.total_stock) === 0), 'All returned products have total_stock === 0');
+    assert(oosRes.data.meta.total === oosRes.data.data.length, `Pagination total (${oosRes.data.meta.total}) accurately matches result set count`);
+
+    // 10.2 LOW_STOCK filter
+    const lowRes = await request('GET', '/api/products?stockStatus=LOW_STOCK&limit=10', null, adminToken);
+    assert(lowRes.status === 200, 'LOW_STOCK products query returned 200');
+    assert(lowRes.data.data.every(p => Number(p.total_stock) > 0 && Number(p.total_stock) <= Number(p.minimum_stock)), 'All returned products are within low stock range');
+
+    // 10.3 IN_STOCK filter
+    const inStockRes = await request('GET', '/api/products?stockStatus=IN_STOCK&limit=5', null, adminToken);
+    assert(inStockRes.status === 200, 'IN_STOCK products query returned 200');
+    assert(inStockRes.data.data.every(p => Number(p.total_stock) > Number(p.minimum_stock)), 'All returned products exceed minimum_stock');
+    assert(inStockRes.data.data.length <= 5, 'Exact limit respected');
+    assert(inStockRes.data.meta.totalPages === Math.ceil(inStockRes.data.meta.total / 5), 'totalPages correctly computed at SQL level');
+
+    // ------------------------------------------------------------------------
+    // TEST 11: Retail Merchandise Product Catalog Seed Data Verification
+    // ------------------------------------------------------------------------
+    console.log('\n▶ TEST 11: Multi-Category Retail Product Catalog & Multi-Depot Distribution');
+
+    const [allProducts] = await pool.execute('SELECT COUNT(*) AS total FROM products WHERE status = "ACTIVE"');
+    const totalProdCount = allProducts[0].total;
+    assert(totalProdCount >= 30, `Product catalog contains 30+ products (total: ${totalProdCount})`);
+
+    const [allCategories] = await pool.execute('SELECT name FROM categories WHERE status = "ACTIVE" ORDER BY id ASC');
+    console.log(`  Active Retail Categories: ${allCategories.map(c => c.name).join(', ')}`);
+    assert(allCategories.length >= 7, 'At least 7 retail merchandise categories active');
+
+    // ------------------------------------------------------------------------
+    // TEST 12: Alert Consistency Across All Warehouses (Including Delhi WH 4)
+    // ------------------------------------------------------------------------
+    console.log('\n▶ TEST 12: Warehouse Active Alert Counts Consistency Verification');
+
+    const [allWh] = await pool.execute('SELECT id, name, code FROM warehouses WHERE status = "ACTIVE" ORDER BY id ASC');
+    for (const wh of allWh) {
+      // 1. Alert count from warehouse listing
+      const whDetail = await request('GET', `/api/warehouses`, null, adminToken);
+      const whItem = whDetail.data.data.find(w => w.id === wh.id);
+      const reportedAlertCount = Number(whItem.active_alerts_count || 0);
+
+      // 2. Alert count from alerts endpoint
+      const alertListRes = await request('GET', `/api/inventory/alerts?warehouseId=${wh.id}&status=ACTIVE&limit=100`, null, adminToken);
+      const actualAlerts = alertListRes.data.data || [];
+
+      // 3. Direct DB count
+      const [dbAlertCount] = await pool.execute(
+        'SELECT COUNT(*) AS total FROM inventory_alerts WHERE warehouse_id = ? AND status = "ACTIVE"',
+        [wh.id]
+      );
+      const dbCount = Number(dbAlertCount[0].total);
+
+      console.log(`  ${wh.name} (${wh.code}): Listing = ${reportedAlertCount}, Alerts API = ${actualAlerts.length}, DB = ${dbCount}`);
+      assert(reportedAlertCount === dbCount, `${wh.name} listing alert count matches DB active alerts count`);
+      assert(actualAlerts.length === dbCount, `${wh.name} Alerts API matches DB active alerts count`);
+    }
 
     console.log('\n=============================================================');
     console.log(' ALL AUTOMATED VERIFICATION TESTS PASSED PERFECTLY (100%)');

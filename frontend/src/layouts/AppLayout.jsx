@@ -94,7 +94,7 @@ export default function AppLayout() {
         </div>
 
         {/* Navigation links - Medium font weight & balanced sizing */}
-        <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto min-h-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        <nav className="flex-1 px-3 pt-3 pb-6 space-y-1 overflow-y-auto min-h-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           {/* Overview */}
           <NavLink
             to="/dashboard"
@@ -183,21 +183,19 @@ export default function AppLayout() {
                   <ArrowUpRight className="w-3.5 h-3.5" />
                   <span>Stock Out</span>
                 </NavLink>
-                {hasRole(['ADMIN', 'MANAGER']) && (
-                  <NavLink
-                    to="/transfers"
-                    className={({ isActive }) =>
-                      `flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                        isActive
-                          ? 'text-[#1E3A2F] bg-[#EAF4EE] font-semibold'
-                          : 'text-stone-500 hover:text-stone-900 hover:bg-[#F5F2EB]'
-                      }`
-                    }
-                  >
-                    <ArrowLeftRight className="w-3.5 h-3.5" />
-                    <span>Transfers</span>
-                  </NavLink>
-                )}
+                <NavLink
+                  to="/transfers"
+                  className={({ isActive }) =>
+                    `flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                      isActive
+                        ? 'text-[#1E3A2F] bg-[#EAF4EE] font-semibold'
+                        : 'text-stone-500 hover:text-stone-900 hover:bg-[#F5F2EB]'
+                    }`
+                  }
+                >
+                  <ArrowLeftRight className="w-3.5 h-3.5" />
+                  <span>Transfers</span>
+                </NavLink>
                 <NavLink
                   to="/categories"
                   className={({ isActive }) =>
@@ -265,21 +263,6 @@ export default function AppLayout() {
             <span>History</span>
           </NavLink>
 
-          {/* Reports */}
-          <NavLink
-            to="/inventory"
-            className={({ isActive }) =>
-              `flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium transition-all ${
-                isActive
-                  ? 'bg-[#1E3A2F] text-white shadow-xs'
-                  : 'text-stone-600 hover:text-stone-900 hover:bg-[#F5F2EB]'
-              }`
-            }
-          >
-            <BarChart2 className="w-4 h-4 shrink-0" />
-            <span>Reports</span>
-          </NavLink>
-
           {/* User Management (Admin only) */}
           {hasRole('ADMIN') && (
             <NavLink
@@ -311,7 +294,33 @@ export default function AppLayout() {
             <Settings className="w-4 h-4 shrink-0" />
             <span>Settings</span>
           </NavLink>
+
+          <div className="h-4 shrink-0" />
         </nav>
+
+        {/* Sidebar Footer — User Summary & Logout */}
+        <div className="p-3 border-t border-[#EBE7DE] shrink-0 bg-[#FBF9F5] shadow-xs">
+          <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl bg-white border border-[#EBE7DE] shadow-2xs mb-1.5">
+            <div className="w-8 h-8 rounded-lg bg-[#1E3A2F] text-white flex items-center justify-center text-xs font-bold shrink-0">
+              {userInitials}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold text-stone-900 truncate leading-tight">
+                {user ? `${user.firstName} ${user.lastName}` : 'User'}
+              </p>
+              <p className="text-[10px] text-stone-400 capitalize font-medium truncate">
+                {user?.role?.toLowerCase() || 'Staff'}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 transition-all cursor-pointer"
+          >
+            <LogOut className="w-4 h-4 shrink-0" />
+            <span>Sign Out</span>
+          </button>
+        </div>
       </aside>
 
       {/* ========================================================================= */}
@@ -375,6 +384,18 @@ export default function AppLayout() {
               >
                 <Boxes className="w-4 h-4" />
                 <span>Stock Matrix</span>
+              </NavLink>
+              <NavLink
+                to="/transfers"
+                onClick={() => setMobileDrawerOpen(false)}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium ${
+                    isActive ? 'bg-[#1E3A2F] text-white font-semibold' : 'text-stone-600 hover:bg-[#F5F2EB]'
+                  }`
+                }
+              >
+                <ArrowLeftRight className="w-4 h-4" />
+                <span>Transfers</span>
               </NavLink>
               <NavLink
                 to="/warehouses"

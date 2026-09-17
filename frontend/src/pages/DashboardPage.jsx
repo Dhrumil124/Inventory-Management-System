@@ -95,149 +95,19 @@ export default function DashboardPage() {
     { date: '14 Sep', stockIn: 1180, stockOut: 980, netStock: 1510 },
   ];
 
-  // Default / fallback Attention Items if database is clean
-  const fallbackAttentionItems = [
-    {
-      id: 1,
-      name: 'Wireless Keyboard',
-      sku: 'KB-001',
-      warehouse: 'Mumbai',
-      available: 8,
-      reorderPoint: 20,
-      status: 'Low Stock',
-      icon: '⌨️'
-    },
-    {
-      id: 2,
-      name: 'A4 Paper (500 sheets)',
-      sku: 'PPR-004',
-      warehouse: 'Ahmedabad',
-      available: 12,
-      reorderPoint: 50,
-      status: 'Low Stock',
-      icon: '📄'
-    },
-    {
-      id: 3,
-      name: 'USB-C Hub',
-      sku: 'HUB-007',
-      warehouse: 'Bengaluru',
-      available: 4,
-      reorderPoint: 15,
-      status: 'Low Stock',
-      icon: '🔌'
-    },
-    {
-      id: 4,
-      name: 'Office Chair',
-      sku: 'CHR-002',
-      warehouse: 'Delhi',
-      available: 3,
-      reorderPoint: 10,
-      status: 'Low Stock',
-      icon: '🪑'
-    },
-    {
-      id: 5,
-      name: 'Monitor 27"',
-      sku: 'MON-027',
-      warehouse: 'Mumbai',
-      available: 5,
-      reorderPoint: 10,
-      status: 'Low Stock',
-      icon: '🖥️'
-    }
-  ];
-
-  // Default / fallback Recent Activity if clean
-  const fallbackActivityItems = [
-    {
-      id: 101,
-      time: '14 Sep, 10:24',
-      type: 'Stock In',
-      typeVariant: 'stock_in',
-      product: 'A4 Paper',
-      qty: '+200',
-      qtyColor: 'text-[#246A48]',
-      warehouse: 'Ahmedabad',
-      by: 'DP',
-      ref: '#GRN-1043'
-    },
-    {
-      id: 102,
-      time: '14 Sep, 09:12',
-      type: 'Stock Out',
-      typeVariant: 'stock_out',
-      product: 'Wireless Keyboard',
-      qty: '-15',
-      qtyColor: 'text-[#C44D3A]',
-      warehouse: 'Mumbai',
-      by: 'SK',
-      ref: '#SO-2219'
-    },
-    {
-      id: 103,
-      time: '14 Sep, 08:45',
-      type: 'Transfer',
-      typeVariant: 'transfer',
-      product: 'Monitor 27"',
-      qty: '-5',
-      qtyColor: 'text-[#2B638A]',
-      warehouse: 'Delhi → Mumbai',
-      by: 'RJ',
-      ref: '#TR-0082'
-    },
-    {
-      id: 104,
-      time: '13 Sep, 17:30',
-      type: 'Stock In',
-      typeVariant: 'stock_in',
-      product: 'USB-C Hub',
-      qty: '+50',
-      qtyColor: 'text-[#246A48]',
-      warehouse: 'Bengaluru',
-      by: 'DP',
-      ref: '#GRN-1042'
-    },
-    {
-      id: 105,
-      time: '13 Sep, 14:11',
-      type: 'Stock Out',
-      typeVariant: 'stock_out',
-      product: 'Office Chair',
-      qty: '-2',
-      qtyColor: 'text-[#C44D3A]',
-      warehouse: 'Delhi',
-      by: 'AM',
-      ref: '#SO-2218'
-    },
-    {
-      id: 106,
-      time: '13 Sep, 11:06',
-      type: 'Adjustment',
-      typeVariant: 'adjustment',
-      product: 'A4 Paper',
-      qty: '-10',
-      qtyColor: 'text-stone-700',
-      warehouse: 'Mumbai',
-      by: 'SK',
-      ref: '#ADJ-0031'
-    }
-  ];
-
-  // Prepare attention items: prefer real API alerts, fallback to rich sample
+  // Prepare attention items: strictly real API alerts
   const attentionItems = (recentActivity?.criticalAlerts && recentActivity.criticalAlerts.length > 0)
     ? recentActivity.criticalAlerts.map(alt => ({
         id: alt.id,
         name: alt.product_name,
         sku: alt.sku || 'SKU-ITEM',
-        warehouse: alt.warehouse_name ? alt.warehouse_name.split(' ')[0] : 'Main Depot',
+        warehouse: alt.warehouse_name ? alt.warehouse_name.split(' ')[0] : 'Depot',
         available: alt.current_quantity,
         reorderPoint: alt.minimum_stock,
         status: alt.alert_type === 'OUT_OF_STOCK' ? 'Out of Stock' : 'Low Stock',
-        icon: '📦'
+        icon: alt.alert_type === 'OUT_OF_STOCK' ? '⚠️' : '📦'
       }))
-    : fallbackAttentionItems;
+    : [];
 
   // Prepare activity items: prefer real API recent movements, fallback to rich sample
   const activityItems = (recentActivity?.recentMovements && recentActivity.recentMovements.length > 0)
@@ -266,10 +136,10 @@ export default function DashboardPage() {
           ref: m.reference || `#MOV-${m.id}`
         };
       })
-    : fallbackActivityItems;
+    : [];
 
-  const totalStockUnits = metrics?.totalStock ? metrics.totalStock.toLocaleString() : '12,486';
-  const totalWarehousesCount = metrics?.totalWarehouses || 4;
+  const totalStockUnits = metrics?.totalStock != null ? Number(metrics.totalStock).toLocaleString() : '0';
+  const totalWarehousesCount = metrics?.totalWarehouses != null ? metrics.totalWarehouses : 0;
 
   return (
     <div className="space-y-6 sm:space-y-7">
@@ -325,10 +195,10 @@ export default function DashboardPage() {
         {/* Card 3: Low-stock items */}
         <StatCard
           title="Low-stock items"
-          value={isLoading ? '...' : (metrics?.lowStockAlerts || 18)}
+          value={isLoading ? '...' : (metrics?.lowStockAlerts ?? 0)}
           icon={AlertTriangle}
           variant="peach"
-          trend={{ value: '↑ 3 new', label: 'vs yesterday', positive: false }}
+          trend={{ value: `${metrics?.lowStockAlerts ?? 0} active`, label: 'reorder thresholds', positive: false }}
         />
 
         {/* Card 4: Today's movements */}
@@ -368,7 +238,7 @@ export default function DashboardPage() {
               <span>Stock out</span>
             </button>
             <button
-              onClick={() => navigate(hasRole(['ADMIN', 'MANAGER']) ? '/transfers' : '/stock-in')}
+              onClick={() => navigate('/transfers')}
               className="bg-white text-stone-700 hover:bg-[#FAF8F5] border border-[#E5E0D6] text-[11px] xl:text-xs font-medium py-1.5 px-2 xl:py-2 xl:px-2.5 rounded-xl flex items-center justify-center gap-1 whitespace-nowrap shadow-subtle transition-all"
             >
               <ArrowLeftRight className="w-3 h-3 xl:w-3.5 xl:h-3.5 shrink-0 text-stone-500" />
@@ -675,39 +545,50 @@ export default function DashboardPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#FAF8F5] text-stone-700">
-                {attentionItems.slice(0, 5).map((item) => (
-                  <tr key={item.id} className="hover:bg-[#FAF8F5]/80 transition-colors">
-                    <td className="py-2.5 pr-2 font-semibold text-stone-900 flex items-center gap-2 truncate max-w-[140px]">
-                      <span className="text-sm shrink-0">{item.icon}</span>
-                      <span className="truncate">{item.name}</span>
-                    </td>
-                    <td className="py-2.5 px-2 font-mono text-[11px] text-stone-500 whitespace-nowrap">
-                      {item.sku}
-                    </td>
-                    <td className="py-2.5 px-2 text-stone-600 whitespace-nowrap">
-                      {item.warehouse}
-                    </td>
-                    <td className="py-2.5 px-2 text-center font-bold text-[#C44D3A] whitespace-nowrap">
-                      {item.available}
-                    </td>
-                    <td className="py-2.5 px-2 text-center text-stone-500 whitespace-nowrap">
-                      {item.reorderPoint}
-                    </td>
-                    <td className="py-2.5 px-2 text-center whitespace-nowrap">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#FDEEE9] text-[#C44D3A] border border-[#FCD8CD]">
-                        {item.status}
-                      </span>
-                    </td>
-                    <td className="py-2.5 pl-2 text-right whitespace-nowrap">
-                      <button
-                        onClick={() => navigate('/stock-in')}
-                        className="px-2 py-1 rounded-lg border border-[#E5E0D6] bg-white text-[10px] font-medium text-stone-700 hover:bg-[#FAF8F5] hover:border-stone-400 transition-colors shadow-2xs"
-                      >
-                        Reorder
-                      </button>
+                {attentionItems.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="py-8 text-center text-xs text-stone-400 font-medium">
+                      <div className="flex flex-col items-center justify-center gap-1.5">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                        <span>All inventory items are currently healthy above threshold.</span>
+                      </div>
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  attentionItems.slice(0, 5).map((item) => (
+                    <tr key={item.id} className="hover:bg-[#FAF8F5]/80 transition-colors">
+                      <td className="py-2.5 pr-2 font-semibold text-stone-900 flex items-center gap-2 truncate max-w-[140px]">
+                        <span className="text-sm shrink-0">{item.icon}</span>
+                        <span className="truncate">{item.name}</span>
+                      </td>
+                      <td className="py-2.5 px-2 font-mono text-[11px] text-stone-500 whitespace-nowrap">
+                        {item.sku}
+                      </td>
+                      <td className="py-2.5 px-2 text-stone-600 whitespace-nowrap">
+                        {item.warehouse}
+                      </td>
+                      <td className="py-2.5 px-2 text-center font-bold text-[#C44D3A] whitespace-nowrap">
+                        {item.available}
+                      </td>
+                      <td className="py-2.5 px-2 text-center text-stone-500 whitespace-nowrap">
+                        {item.reorderPoint}
+                      </td>
+                      <td className="py-2.5 px-2 text-center whitespace-nowrap">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#FDEEE9] text-[#C44D3A] border border-[#FCD8CD]">
+                          {item.status}
+                        </span>
+                      </td>
+                      <td className="py-2.5 pl-2 text-right whitespace-nowrap">
+                        <button
+                          onClick={() => navigate('/stock-in')}
+                          className="px-2 py-1 rounded-lg border border-[#E5E0D6] bg-white text-[10px] font-medium text-stone-700 hover:bg-[#FAF8F5] hover:border-stone-400 transition-colors shadow-2xs"
+                        >
+                          Reorder
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -783,33 +664,69 @@ export default function DashboardPage() {
       {/* ========================================================================= */}
       {/* BOTTOM ALERT BANNER */}
       {/* ========================================================================= */}
-      <div className="bg-[#FDF3EE] rounded-2xl border border-[#F7DFD3] p-4.5 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-full bg-[#FCE8DF] text-[#C44D3A] flex items-center justify-center shrink-0 border border-[#FAD6C6]">
-            <Bell className="w-5 h-5" />
-          </div>
-          <div>
-            <h4 className="text-xs sm:text-sm font-bold text-stone-900">
-              3 items crossed reorder point today
-            </h4>
-            <p className="text-xs text-stone-600 mt-0.5">
-              Wireless Keyboard, USB-C Hub, Office Chair are below their reorder levels.
-            </p>
-          </div>
-        </div>
+      {(() => {
+        const lowCnt = metrics?.lowStockAlerts || 0;
+        const oosCnt = metrics?.outOfStockAlerts || 0;
+        const totalAlerts = lowCnt + oosCnt;
 
-        <div className="flex items-center gap-4 self-end sm:self-center">
-          <button
-            onClick={() => navigate('/alerts')}
-            className="px-3.5 py-1.5 rounded-xl bg-white border border-[#E5E0D6] shadow-subtle hover:bg-[#FAF8F5] text-xs font-semibold text-stone-800 transition-colors"
-          >
-            View alerts →
-          </button>
-          <span className="hidden lg:inline text-xs italic text-stone-400 font-serif">
-            “Good inventory management turns hidden costs into visible opportunities.”
-          </span>
-        </div>
-      </div>
+        if (totalAlerts === 0) {
+          return (
+            <div className="bg-[#EBF5EF] rounded-2xl border border-[#D5EADF] p-4.5 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-full bg-[#D8EFE3] text-[#246A48] flex items-center justify-center shrink-0 border border-[#C5E6D3]">
+                  <CheckCircle2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-xs sm:text-sm font-bold text-stone-900">
+                    All inventory levels healthy
+                  </h4>
+                  <p className="text-xs text-stone-600 mt-0.5">
+                    No products currently at or below their reorder threshold for this facility.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 self-end sm:self-center">
+                <span className="hidden lg:inline text-xs italic text-stone-400 font-serif">
+                  “Good inventory management turns hidden costs into visible opportunities.”
+                </span>
+              </div>
+            </div>
+          );
+        }
+
+        return (
+          <div className="bg-[#FDF3EE] rounded-2xl border border-[#F7DFD3] p-4.5 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-full bg-[#FCE8DF] text-[#C44D3A] flex items-center justify-center shrink-0 border border-[#FAD6C6]">
+                <Bell className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-xs sm:text-sm font-bold text-stone-900">
+                  {totalAlerts} items require attention
+                </h4>
+                <p className="text-xs text-stone-600 mt-0.5">
+                  {oosCnt > 0 ? `${oosCnt} out of stock` : ''}
+                  {oosCnt > 0 && lowCnt > 0 ? ' and ' : ''}
+                  {lowCnt > 0 ? `${lowCnt} low stock` : ''} products need restocking.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 self-end sm:self-center">
+              <button
+                onClick={() => navigate('/alerts')}
+                className="px-3.5 py-1.5 rounded-xl bg-white border border-[#E5E0D6] shadow-subtle hover:bg-[#FAF8F5] text-xs font-semibold text-stone-800 transition-colors"
+              >
+                View alerts →
+              </button>
+              <span className="hidden lg:inline text-xs italic text-stone-400 font-serif">
+                “Good inventory management turns hidden costs into visible opportunities.”
+              </span>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

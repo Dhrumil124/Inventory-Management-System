@@ -38,19 +38,18 @@ export default function TransfersPage() {
   useEffect(() => {
     async function loadInitialData() {
       try {
-        const [whRes, destWhRes, prodRes, histRes] = await Promise.all([
+        const [whRes, prodRes, histRes] = await Promise.all([
           api.get('/warehouses'),
-          api.get('/warehouses?all=true'),
           api.get('/products?limit=100'),
           api.get('/inventory/history?movementType=TRANSFER_OUT&limit=5'),
         ]);
         if (whRes.data.success) {
           setWarehouses(whRes.data.data);
+          setDestinationWarehouses(whRes.data.data);
           if (whRes.data.data.length === 1 && !searchParams.get('sourceWarehouseId')) {
             setForm((prev) => ({ ...prev, sourceWarehouseId: String(whRes.data.data[0].id) }));
           }
         }
-        if (destWhRes.data.success) setDestinationWarehouses(destWhRes.data.data);
         if (prodRes.data.success) setProducts(prodRes.data.data);
         if (histRes.data.success) setRecentTransfers(histRes.data.data);
       } catch (err) {

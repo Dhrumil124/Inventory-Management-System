@@ -1,37 +1,50 @@
 const pool = require('../config/db');
 const { ROLES } = require('../utils/constants');
-const { successResponse } = require('../utils/responseFormatter');
+const { successResponse, errorResponse } = require('../utils/responseFormatter');
 
 class DashboardController {
+  static async validateWarehouseAccess(req, res, warehouseId) {
+    if (!warehouseId || isNaN(warehouseId)) {
+      return { ok: false, error: errorResponse(res, 'Valid warehouseId is required.', 400) };
+    }
+
+    const [whRows] = await pool.execute('SELECT id, name, status FROM warehouses WHERE id = ?', [warehouseId]);
+    if (whRows.length === 0) {
+      return { ok: false, error: errorResponse(res, 'Warehouse not found.', 404) };
+    }
+    if (whRows[0].status !== 'ACTIVE') {
+      return { ok: false, error: errorResponse(res, 'Warehouse is inactive or decommissioned.', 400) };
+    }
+
+    if (req.user.role !== ROLES.ADMIN && !req.user.assignedWarehouseIds.includes(warehouseId)) {
+      return {
+        ok: false,
+        error: errorResponse(res, 'Forbidden: You do not have permission to access the requested warehouse.', 403)
+      };
+    }
+
+    return { ok: true, warehouse: whRows[0] };
+  }
+
   static async getMetrics(req, res, next) {
     try {
       const warehouseId = req.query.warehouseId ? parseInt(req.query.warehouseId, 10) : null;
       let whClause = '';
       let whParams = [];
 
-      if (req.user.role !== ROLES.ADMIN) {
-        if (req.user.assignedWarehouseIds.length === 0) {
+      if (warehouseId) {
+        const check = await DashboardController.validateWarehouseAccess(req, res, warehouseId);
+        if (!check.ok) return;
+        whClause = 'AND warehouse_id = ?';
+        whParams = [warehouseId];
+      } else if (req.user.role !== ROLES.ADMIN) {
+        if (!req.user.assignedWarehouseIds || req.user.assignedWarehouseIds.length === 0) {
           whClause = 'AND warehouse_id IN (-1)';
         } else {
           const ph = req.user.assignedWarehouseIds.map(() => '?').join(',');
           whClause = `AND warehouse_id IN (${ph})`;
           whParams = req.user.assignedWarehouseIds;
         }
-      }
-
-      if (warehouseId) {
-        if (req.user.role !== ROLES.ADMIN && !req.user.assignedWarehouseIds.includes(warehouseId)) {
-          return successResponse(res, {
-            totalProducts: 0,
-            totalWarehouses: 0,
-            totalStock: 0,
-            totalInventoryValue: 0,
-            lowStockAlerts: 0,
-            outOfStockAlerts: 0
-          }, 'Dashboard metrics retrieved successfully.');
-        }
-        whClause = 'AND warehouse_id = ?';
-        whParams = [warehouseId];
       }
 
       // Total Active Products (or active products in warehouse if filtered)
@@ -101,19 +114,19 @@ class DashboardController {
       let whClause = '';
       let whParams = [];
 
-      if (req.user.role !== ROLES.ADMIN) {
-        if (req.user.assignedWarehouseIds.length === 0) {
+      if (warehouseId) {
+        const check = await DashboardController.validateWarehouseAccess(req, res, warehouseId);
+        if (!check.ok) return;
+        whClause = 'AND i.warehouse_id = ?';
+        whParams = [warehouseId];
+      } else if (req.user.role !== ROLES.ADMIN) {
+        if (!req.user.assignedWarehouseIds || req.user.assignedWarehouseIds.length === 0) {
           whClause = 'AND i.warehouse_id IN (-1)';
         } else {
           const ph = req.user.assignedWarehouseIds.map(() => '?').join(',');
           whClause = `AND i.warehouse_id IN (${ph})`;
           whParams = req.user.assignedWarehouseIds;
         }
-      }
-
-      if (warehouseId) {
-        whClause = 'AND i.warehouse_id = ?';
-        whParams = [warehouseId];
       }
 
       // 1. Warehouse-wise distribution
@@ -169,19 +182,19 @@ class DashboardController {
       let whClause = '';
       let whParams = [];
 
-      if (req.user.role !== ROLES.ADMIN) {
-        if (req.user.assignedWarehouseIds.length === 0) {
+      if (warehouseId) {
+        const check = await DashboardController.validateWarehouseAccess(req, res, warehouseId);
+        if (!check.ok) return;
+        whClause = 'WHERE sm.warehouse_id = ?';
+        whParams = [warehouseId];
+      } else if (req.user.role !== ROLES.ADMIN) {
+        if (!req.user.assignedWarehouseIds || req.user.assignedWarehouseIds.length === 0) {
           whClause = 'WHERE sm.warehouse_id IN (-1)';
         } else {
           const ph = req.user.assignedWarehouseIds.map(() => '?').join(',');
           whClause = `WHERE sm.warehouse_id IN (${ph})`;
           whParams = req.user.assignedWarehouseIds;
         }
-      }
-
-      if (warehouseId) {
-        whClause = 'WHERE sm.warehouse_id = ?';
-        whParams = [warehouseId];
       }
 
       const [recentMovements] = await pool.execute(
