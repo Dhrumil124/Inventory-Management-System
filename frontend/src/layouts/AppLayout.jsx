@@ -183,19 +183,21 @@ export default function AppLayout() {
                   <ArrowUpRight className="w-3.5 h-3.5" />
                   <span>Stock Out</span>
                 </NavLink>
-                <NavLink
-                  to="/transfers"
-                  className={({ isActive }) =>
-                    `flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                      isActive
-                        ? 'text-[#1E3A2F] bg-[#EAF4EE] font-semibold'
-                        : 'text-stone-500 hover:text-stone-900 hover:bg-[#F5F2EB]'
-                    }`
-                  }
-                >
-                  <ArrowLeftRight className="w-3.5 h-3.5" />
-                  <span>Transfers</span>
-                </NavLink>
+                {hasRole('ADMIN', 'MANAGER') && (
+                  <NavLink
+                    to="/transfers"
+                    className={({ isActive }) =>
+                      `flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                        isActive
+                          ? 'text-[#1E3A2F] bg-[#EAF4EE] font-semibold'
+                          : 'text-stone-500 hover:text-stone-900 hover:bg-[#F5F2EB]'
+                      }`
+                    }
+                  >
+                    <ArrowLeftRight className="w-3.5 h-3.5" />
+                    <span>Transfers</span>
+                  </NavLink>
+                )}
                 <NavLink
                   to="/categories"
                   className={({ isActive }) =>
@@ -385,18 +387,20 @@ export default function AppLayout() {
                 <Boxes className="w-4 h-4" />
                 <span>Stock Matrix</span>
               </NavLink>
-              <NavLink
-                to="/transfers"
-                onClick={() => setMobileDrawerOpen(false)}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium ${
-                    isActive ? 'bg-[#1E3A2F] text-white font-semibold' : 'text-stone-600 hover:bg-[#F5F2EB]'
-                  }`
-                }
-              >
-                <ArrowLeftRight className="w-4 h-4" />
-                <span>Transfers</span>
-              </NavLink>
+              {hasRole('ADMIN', 'MANAGER') && (
+                <NavLink
+                  to="/transfers"
+                  onClick={() => setMobileDrawerOpen(false)}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium ${
+                      isActive ? 'bg-[#1E3A2F] text-white font-semibold' : 'text-stone-600 hover:bg-[#F5F2EB]'
+                    }`
+                  }
+                >
+                  <ArrowLeftRight className="w-4 h-4" />
+                  <span>Transfers</span>
+                </NavLink>
+              )}
               <NavLink
                 to="/warehouses"
                 onClick={() => setMobileDrawerOpen(false)}

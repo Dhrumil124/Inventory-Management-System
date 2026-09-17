@@ -44,6 +44,17 @@ class WarehouseController {
     }
   }
 
+  static async listTransferDestinations(req, res, next) {
+    try {
+      const [destinations] = await pool.execute(
+        'SELECT id, name, code, city, state FROM warehouses WHERE status = "ACTIVE" ORDER BY name ASC'
+      );
+      return successResponse(res, destinations, 'Transfer destination facilities retrieved successfully.');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async getWarehouseById(req, res, next) {
     try {
       const warehouseId = parseInt(req.params.id, 10);

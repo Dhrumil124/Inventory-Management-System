@@ -10,6 +10,7 @@ const validateRequest = require('../middleware/validator');
 router.use(authenticateToken);
 
 router.get('/', WarehouseController.listWarehouses);
+router.get('/destinations', WarehouseController.listTransferDestinations);
 router.get('/:id', WarehouseController.getWarehouseById);
 router.post('/', requireRole(ROLES.ADMIN), warehouseValidation, validateRequest, WarehouseController.createWarehouse);
 router.put('/:id', requireRole(ROLES.ADMIN), WarehouseController.updateWarehouse);

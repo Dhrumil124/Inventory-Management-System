@@ -296,52 +296,47 @@ async function runTests() {
     assert(validStockOut.data.data.newQuantity === 70, 'New inventory quantity is exactly 70');
 
     // ------------------------------------------------------------------------
-    // TEST 4: Stock Transfer with Deterministic Row Locking & Dual-Warehouse Auth
+    // TEST 4: Stock Transfer with Manager Authorization & Destination Hubs
     // ------------------------------------------------------------------------
-    console.log('\n▶ TEST 4: Stock Transfer Dual-Warehouse Assignment Authorization & Concurrency');
+    console.log('\n▶ TEST 4: Stock Transfer Manager Authorization & Destination Facility Routing');
 
-    // 4.1 Staff Multi (assigned WH 1 & WH 2) transfers stock between assigned facilities -> SUCCEEDS (201)
-    const staffMultiTransfer = await request('POST', '/api/inventory/transfer', {
+    // 4.1 Staff attempting transfer -> 403 Forbidden (Only Admin and Manager permitted)
+    const staffTransferAttempt = await request('POST', '/api/inventory/transfer', {
+      productId: testProductId,
+      sourceWarehouseId: 1,
+      destinationWarehouseId: 2,
+      quantity: 5,
+      reason: 'Staff unauthorized transfer attempt'
+    }, staffAmdToken);
+    assert(staffTransferAttempt.status === 403, 'Staff attempting transfer blocked with 403 Forbidden');
+
+    // 4.2 Manager Ahmedabad (assigned WH 1 only) transferring to WH 2 (Surat) -> SUCCEEDS (201 Created)
+    const mgrTransfer = await request('POST', '/api/inventory/transfer', {
       productId: testProductId,
       sourceWarehouseId: 1,
       destinationWarehouseId: 2,
       quantity: 15,
-      reference: 'TEST-TRF-STAFF-01',
-      reason: 'Staff transferring between assigned branches'
-    }, staffMultiToken);
-    assert(staffMultiTransfer.status === 201, 'Staff assigned to BOTH facilities transfer succeeded with 201 Created');
-    assert(staffMultiTransfer.data.data.source.newQuantity === 55, 'Source WH 1 updated to 55 (70 - 15)');
-    assert(staffMultiTransfer.data.data.destination.newQuantity === 15, 'Destination WH 2 updated to 15 (0 + 15)');
-
-    // 4.2 Staff Multi attempting transfer to unassigned WH 3 (Mumbai) -> 403 Forbidden
-    const staffMultiBadDest = await request('POST', '/api/inventory/transfer', {
-      productId: testProductId,
-      sourceWarehouseId: 1,
-      destinationWarehouseId: 3, // WH 3 is not assigned to staff.multi
-      quantity: 5,
-      reason: 'Staff transfer to unassigned destination'
-    }, staffMultiToken);
-    assert(staffMultiBadDest.status === 403, 'Staff transfer to unassigned destination warehouse rejected with 403 Forbidden');
-
-    // 4.3 Staff Ahmedabad (assigned WH 1 only) attempting transfer to WH 2 (unassigned) -> 403 Forbidden
-    const staffSingleBadTransfer = await request('POST', '/api/inventory/transfer', {
-      productId: testProductId,
-      sourceWarehouseId: 1,
-      destinationWarehouseId: 2,
-      quantity: 5,
-      reason: 'Staff single-facility transfer attempt'
-    }, staffAmdToken);
-    assert(staffSingleBadTransfer.status === 403, 'Staff with unassigned destination rejected with 403 Forbidden');
-
-    // 4.4 Manager Ahmedabad (assigned WH 1 only) attempting transfer to WH 2 (unassigned to manager.ahmedabad) -> 403 Forbidden
-    const mgrSingleBadTransfer = await request('POST', '/api/inventory/transfer', {
-      productId: testProductId,
-      sourceWarehouseId: 1,
-      destinationWarehouseId: 2,
-      quantity: 5,
-      reason: 'Manager transferring to unassigned destination'
+      reference: 'TEST-TRF-MGR-01',
+      reason: 'Manager regional branch replenishment'
     }, managerAmdToken);
-    assert(mgrSingleBadTransfer.status === 403, 'Manager transfer to unassigned destination facility rejected with 403 Forbidden');
+    assert(mgrTransfer.status === 201, 'Manager transfer from assigned source to destination branch succeeded with 201 Created');
+    assert(mgrTransfer.data.data.source.newQuantity === 55, 'Source WH 1 updated to 55 (70 - 15)');
+    assert(mgrTransfer.data.data.destination.newQuantity === 15, 'Destination WH 2 updated to 15 (0 + 15)');
+
+    // 4.3 Manager attempting transfer from an UNASSIGNED source warehouse (WH 2) -> 403 Forbidden
+    const mgrBadSourceTransfer = await request('POST', '/api/inventory/transfer', {
+      productId: testProductId,
+      sourceWarehouseId: 2,
+      destinationWarehouseId: 1,
+      quantity: 5,
+      reason: 'Manager transferring from unassigned origin facility'
+    }, managerAmdToken);
+    assert(mgrBadSourceTransfer.status === 403, 'Manager transfer from unassigned source warehouse rejected with 403 Forbidden');
+
+    // 4.4 Get transfer destinations endpoint -> Returns all active facilities
+    const destListRes = await request('GET', '/api/warehouses/destinations', null, managerAmdToken);
+    assert(destListRes.status === 200, 'GET /api/warehouses/destinations returned 200 OK');
+    assert(destListRes.data.data.length >= 4, `All active destination facilities returned (count: ${destListRes.data.data.length})`);
 
     // 4.5 Admin transfers between any facilities (WH 1 to WH 2) -> SUCCEEDS (201)
     const adminTransfer = await request('POST', '/api/inventory/transfer', {

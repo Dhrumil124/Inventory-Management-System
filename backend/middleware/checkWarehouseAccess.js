@@ -106,28 +106,24 @@ function verifyTransferWarehouseAccess() {
         return next();
       }
 
-      // For MANAGER and STAFF: BOTH source and destination warehouses must be assigned
-      const assigned = req.user.assignedWarehouseIds || [];
-      const hasSource = assigned.includes(sourceWarehouseId);
-      const hasDest = assigned.includes(destinationWarehouseId);
+      // For MANAGER: source warehouse MUST be an assigned warehouse
+      if (req.user.role === ROLES.MANAGER) {
+        const assigned = req.user.assignedWarehouseIds || [];
+        const hasSource = assigned.includes(sourceWarehouseId);
 
-      if (!hasSource) {
-        return errorResponse(
-          res,
-          `Forbidden: You do not have permission to transfer stock from unassigned source warehouse ID ${sourceWarehouseId}.`,
-          403
-        );
+        if (!hasSource) {
+          return errorResponse(
+            res,
+            `Forbidden: You do not have permission to transfer stock from unassigned source warehouse ID ${sourceWarehouseId}.`,
+            403
+          );
+        }
+
+        return next();
       }
 
-      if (!hasDest) {
-        return errorResponse(
-          res,
-          `Forbidden: You do not have permission to transfer stock to unassigned destination warehouse ID ${destinationWarehouseId}.`,
-          403
-        );
-      }
-
-      next();
+      // Other roles (e.g., STAFF) are not permitted to initiate transfers
+      return errorResponse(res, 'Forbidden: You do not have permission to initiate stock transfers.', 403);
     } catch (error) {
       console.error('[TRANSFER-ACCESS] Verification failed:', error);
       return errorResponse(res, 'Server error verifying transfer permissions.', 500);
