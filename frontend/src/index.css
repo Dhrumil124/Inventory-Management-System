@@ -5,33 +5,39 @@
 @layer base {
   html {
     color-scheme: light;
+    background-color: #FBF9F5;
   }
 
   body {
-    @apply bg-slate-50 text-slate-800 antialiased;
+    @apply bg-[#FBF9F5] text-stone-800 antialiased font-sans;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
   
-  /* Refined custom scrollbar */
+  /* Refined warm minimalist scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #f8fafc;
+    background: #F7F5F0;
   }
   ::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: #DDD8CD;
     border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+    background: #BFB8A9;
   }
 }
 
 @layer components {
   /* Clean subtle focus ring style across inputs and buttons */
   .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600;
+    @apply focus:outline-none focus:ring-2 focus:ring-brand-800/20 focus:border-brand-800 transition-all;
+  }
+  
+  /* Warm editorial card surface */
+  .editorial-card {
+    @apply bg-white rounded-2xl border border-[#EBE7DE] shadow-card transition-all;
   }
 }

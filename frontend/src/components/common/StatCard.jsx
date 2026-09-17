@@ -10,46 +10,48 @@ export default function StatCard({
   className = '',
 }) {
   const iconVariants = {
-    default: 'bg-slate-100 text-slate-700 border border-slate-200/60',
-    brand: 'bg-brand-50 text-brand-700 border border-brand-200/60',
-    forest: 'bg-brand-50 text-brand-700 border border-brand-200/60',
-    accent: 'bg-accent-50 text-accent-700 border border-accent-200/60',
-    emerald: 'bg-emerald-50 text-emerald-700 border border-emerald-200/60',
-    amber: 'bg-amber-50 text-amber-700 border border-amber-200/60',
-    rose: 'bg-rose-50 text-rose-700 border border-rose-200/60',
-    blue: 'bg-sky-50 text-sky-700 border border-sky-200/60',
+    default: 'bg-[#F4F4F4] text-stone-700 border border-[#EBEBEB]',
+    gray: 'bg-[#F4F4F4] text-stone-700 border border-[#EBEBEB]',
+    brand: 'bg-[#EAF4EE] text-[#27784E] border border-[#D5EADB]',
+    forest: 'bg-[#EAF4EE] text-[#27784E] border border-[#D5EADB]',
+    mint: 'bg-[#EAF4EE] text-[#27784E] border border-[#D5EADB]',
+    emerald: 'bg-[#EAF4EE] text-[#27784E] border border-[#D5EADB]',
+    accent: 'bg-[#EAF4EE] text-[#27784E] border border-[#D5EADB]',
+    amber: 'bg-[#FDEEE9] text-[#C44D3A] border border-[#FCD8CD]',
+    peach: 'bg-[#FDEEE9] text-[#C44D3A] border border-[#FCD8CD]',
+    coral: 'bg-[#FDEEE9] text-[#C44D3A] border border-[#FCD8CD]',
+    rose: 'bg-[#FDEEE9] text-[#C44D3A] border border-[#FCD8CD]',
+    sage: 'bg-[#EAF5F0] text-[#287550] border border-[#D0E7DC]',
+    blue: 'bg-[#EDF4F9] text-[#2B638A] border border-[#D3E3EF]',
   };
 
   return (
-    <div className={`bg-white rounded-xl border border-slate-200/80 p-4 sm:p-5 shadow-xs transition-shadow hover:shadow-subtle min-w-0 overflow-hidden ${className}`}>
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 truncate" title={title}>
-            {title}
-          </p>
-          <p className="text-xl sm:text-2xl font-bold text-slate-900 mt-1 tracking-tight truncate" title={typeof value === 'string' ? value : undefined}>
-            {value}
-          </p>
-          {subtitle && (
-            <p className="text-xs text-slate-500 mt-0.5 line-clamp-1" title={subtitle}>
-              {subtitle}
-            </p>
-          )}
-        </div>
-        {Icon && (
-          <div className={`p-2 sm:p-2.5 rounded-lg shrink-0 ${iconVariants[variant] || iconVariants.default}`}>
-            <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
-          </div>
-        )}
-      </div>
-      {trend && (
-        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-xs">
-          <span className={trend.positive ? 'text-emerald-700 font-medium' : 'text-rose-700 font-medium'}>
-            {trend.value}
-          </span>
-          <span className="text-slate-500">{trend.label}</span>
+    <div className={`bg-white rounded-2xl border border-[#EBE7DE] p-2.5 sm:p-3 xl:p-3.5 shadow-card transition-all hover:border-[#DDD7CC] flex items-center gap-2 xl:gap-2.5 min-w-0 ${className}`}>
+      {Icon && (
+        <div className={`w-8 h-8 sm:w-8.5 sm:h-8.5 xl:w-9.5 xl:h-9.5 rounded-xl shrink-0 flex items-center justify-center font-medium ${iconVariants[variant] || iconVariants.default}`}>
+          <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-current" />
         </div>
       )}
+      <div className="min-w-0 flex-1 overflow-hidden">
+        <p className="text-[11px] sm:text-xs font-medium text-stone-500 leading-tight truncate" title={title}>
+          {title}
+        </p>
+        <p className="text-base sm:text-lg xl:text-xl font-bold text-stone-900 mt-0.5 tracking-tight whitespace-nowrap font-sans leading-none">
+          {value}
+        </p>
+        {trend ? (
+          <div className="mt-1 flex flex-wrap items-baseline gap-x-1 gap-y-0.5 text-[10px] sm:text-[11px] leading-tight">
+            <span className={`font-semibold shrink-0 ${trend.positive === false ? 'text-[#C44D3A]' : 'text-[#27784E]'}`}>
+              {trend.value}
+            </span>
+            <span className="text-stone-400 text-[9.5px] sm:text-[10.5px] leading-tight truncate">{trend.label}</span>
+          </div>
+        ) : subtitle ? (
+          <p className="text-[10px] sm:text-[11px] text-stone-400 mt-0.5 truncate" title={subtitle}>
+            {subtitle}
+          </p>
+        ) : null}
+      </div>
     </div>
   );
 }

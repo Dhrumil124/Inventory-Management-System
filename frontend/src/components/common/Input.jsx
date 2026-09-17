@@ -40,12 +40,12 @@ export default function Input({
           placeholder={placeholder}
           disabled={disabled}
           required={required}
-          className={`w-full rounded-lg border bg-white px-3.5 py-2 text-sm text-slate-900 transition-colors placeholder:text-slate-400 disabled:bg-slate-50 disabled:text-slate-500 focus:outline-none focus:ring-2 ${
+          className={`w-full rounded-xl border bg-white px-3.5 py-2 text-sm text-stone-900 transition-colors placeholder:text-stone-400 disabled:bg-[#FAF8F5] disabled:text-stone-400 focus:outline-none focus:ring-2 ${
             Icon ? 'pl-9' : ''
           } ${
             error
-              ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-200'
-              : 'border-slate-300/90 focus:border-brand-600 focus:ring-brand-500/20 shadow-2xs'
+              ? 'border-[#FBD6CC] focus:border-accent-500 focus:ring-accent-200'
+              : 'border-[#E5E0D6] focus:border-brand-800 focus:ring-brand-800/20 shadow-subtle'
           } ${className}`}
           {...props}
         />

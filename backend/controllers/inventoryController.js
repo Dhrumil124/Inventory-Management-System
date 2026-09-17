@@ -53,9 +53,24 @@ class InventoryController {
       }
 
       // Search filter
-      if (search) {
-        whereConditions.push('(p.name LIKE ? OR p.sku LIKE ? OR w.name LIKE ?)');
-        params.push(search, search, search);
+      if (req.query.search && req.query.search.trim()) {
+        const terms = req.query.search.trim().split(/\s+/).filter(Boolean);
+        terms.forEach((term) => {
+          let altTerm = null;
+          if (/^alumin/i.test(term)) {
+            altTerm = term.toLowerCase().includes('ium')
+              ? term.replace(/ium/i, 'um')
+              : term.replace(/um/i, 'ium');
+          }
+
+          if (altTerm) {
+            whereConditions.push('(p.name LIKE ? OR p.sku LIKE ? OR w.name LIKE ? OR c.name LIKE ? OR p.name LIKE ? OR p.sku LIKE ?)');
+            params.push(`%${term}%`, `%${term}%`, `%${term}%`, `%${term}%`, `%${altTerm}%`, `%${altTerm}%`);
+          } else {
+            whereConditions.push('(p.name LIKE ? OR p.sku LIKE ? OR w.name LIKE ? OR c.name LIKE ?)');
+            params.push(`%${term}%`, `%${term}%`, `%${term}%`, `%${term}%`);
+          }
+        });
       }
 
       // Stock status filter

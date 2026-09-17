@@ -9,7 +9,6 @@ class ProductController {
       const limit = Math.min(100, Math.max(1, parseInt(req.query.limit || '10', 10)));
       const offset = (page - 1) * limit;
 
-      const search = req.query.search ? `%${req.query.search.trim()}%` : null;
       const categoryId = req.query.categoryId ? parseInt(req.query.categoryId, 10) : null;
       const status = req.query.status || null;
       const stockStatus = req.query.stockStatus || null;
@@ -17,9 +16,24 @@ class ProductController {
       let whereConditions = [];
       let params = [];
 
-      if (search) {
-        whereConditions.push('(p.name LIKE ? OR p.sku LIKE ?)');
-        params.push(search, search);
+      if (req.query.search && req.query.search.trim()) {
+        const terms = req.query.search.trim().split(/\s+/).filter(Boolean);
+        terms.forEach((term) => {
+          let altTerm = null;
+          if (/^alumin/i.test(term)) {
+            altTerm = term.toLowerCase().includes('ium')
+              ? term.replace(/ium/i, 'um')
+              : term.replace(/um/i, 'ium');
+          }
+
+          if (altTerm) {
+            whereConditions.push('(p.name LIKE ? OR p.sku LIKE ? OR c.name LIKE ? OR p.name LIKE ? OR p.sku LIKE ?)');
+            params.push(`%${term}%`, `%${term}%`, `%${term}%`, `%${altTerm}%`, `%${altTerm}%`);
+          } else {
+            whereConditions.push('(p.name LIKE ? OR p.sku LIKE ? OR c.name LIKE ?)');
+            params.push(`%${term}%`, `%${term}%`, `%${term}%`);
+          }
+        });
       }
 
       if (categoryId) {

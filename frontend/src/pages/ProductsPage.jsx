@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import Table from '../components/common/Table';
@@ -14,6 +14,7 @@ import { Plus, Search, Eye, Edit2, ShieldAlert } from 'lucide-react';
 export default function ProductsPage() {
   const { hasRole } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -22,11 +23,19 @@ export default function ProductsPage() {
   const [successMessage, setSuccessMessage] = useState('');
 
   // Filters & Pagination state
-  const [search, setSearch] = useState('');
+  const querySearch = searchParams.get('search') || '';
+  const [search, setSearch] = useState(querySearch);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [stockStatus, setStockStatus] = useState('');
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0, totalPages: 1 });
+
+  // Synchronize state when URL search params change (e.g. from global search bar)
+  useEffect(() => {
+    const urlSearch = searchParams.get('search') || '';
+    setSearch(urlSearch);
+    setPage(1);
+  }, [searchParams]);
 
   // Add Product Modal State
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -307,8 +316,14 @@ export default function ProductsPage() {
             placeholder="Search by product name or SKU..."
             value={search}
             onChange={(e) => {
-              setSearch(e.target.value);
+              const val = e.target.value;
+              setSearch(val);
               setPage(1);
+              if (val.trim()) {
+                setSearchParams({ search: val });
+              } else {
+                setSearchParams({});
+              }
             }}
             icon={Search}
           />

@@ -11,15 +11,15 @@ export default function Table({
   onRowClick,
 }) {
   return (
-    <div className="w-full bg-white rounded-xl border border-slate-200/80 shadow-xs overflow-hidden">
+    <div className="w-full bg-white rounded-2xl border border-[#EBE7DE] shadow-card overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-slate-50/80 border-b border-slate-200/80">
+            <tr className="bg-[#FAF8F5] border-b border-[#EBE7DE]">
               {columns.map((col, idx) => (
                 <th
                   key={idx}
-                  className={`px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500 ${
+                  className={`px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-stone-500 ${
                     col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'
                   } ${col.className || ''}`}
                 >
@@ -28,14 +28,14 @@ export default function Table({
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
+          <tbody className="divide-y divide-[#F0ECE4] text-sm text-stone-700">
             {isLoading ? (
               // Skeleton loading rows
               Array.from({ length: pagination?.limit || 5 }).map((_, rIdx) => (
                 <tr key={rIdx} className="animate-pulse">
                   {columns.map((_, cIdx) => (
                     <td key={cIdx} className="px-4 py-3.5">
-                      <div className="h-4 bg-slate-200/60 rounded-md w-3/4" />
+                      <div className="h-4 bg-stone-200/60 rounded-md w-3/4" />
                     </td>
                   ))}
                 </tr>
@@ -44,12 +44,12 @@ export default function Table({
               // Empty state
               <tr>
                 <td colSpan={columns.length} className="px-6 py-12 text-center">
-                  <div className="flex flex-col items-center justify-center text-slate-400">
-                    <div className="p-3 bg-slate-50 rounded-full mb-3 border border-slate-100">
+                  <div className="flex flex-col items-center justify-center text-stone-400">
+                    <div className="p-3 bg-[#FAF8F5] rounded-full mb-3 border border-[#EBE7DE]">
                       <Inbox className="w-6 h-6 stroke-[1.5]" />
                     </div>
-                    <p className="text-sm font-medium text-slate-600">{emptyMessage}</p>
-                    <p className="text-xs text-slate-400 mt-0.5">Try adjusting your filters or search terms.</p>
+                    <p className="text-sm font-medium text-stone-600">{emptyMessage}</p>
+                    <p className="text-xs text-stone-400 mt-0.5">Try adjusting your filters or search terms.</p>
                   </div>
                 </td>
               </tr>
@@ -60,7 +60,7 @@ export default function Table({
                   key={row.id || rIdx}
                   onClick={() => onRowClick && onRowClick(row)}
                   className={`transition-colors ${
-                    onRowClick ? 'cursor-pointer hover:bg-slate-50/80' : 'hover:bg-slate-50/50'
+                    onRowClick ? 'cursor-pointer hover:bg-[#FAF8F5]' : 'hover:bg-[#FAF8F5]/60'
                   }`}
                 >
                   {columns.map((col, cIdx) => (
@@ -82,7 +82,7 @@ export default function Table({
 
       {/* Pagination Footer */}
       {pagination && pagination.totalPages > 1 && (
-        <div className="px-4 py-3 bg-slate-50/80 border-t border-slate-200/80 flex items-center justify-between text-xs text-slate-500">
+        <div className="px-4 py-3 bg-[#FAF8F5] border-t border-[#EBE7DE] flex items-center justify-between text-xs text-stone-500">
           <div>
             Showing <span className="font-semibold text-slate-800">{(pagination.page - 1) * pagination.limit + 1}</span> to{' '}
             <span className="font-semibold text-slate-800">

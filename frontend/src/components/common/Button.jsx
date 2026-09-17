@@ -16,12 +16,12 @@ export default function Button({
   const baseStyles = 'inline-flex items-center justify-center font-medium transition-all duration-150 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed';
 
   const variants = {
-    primary: 'bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800 focus:ring-brand-500/30 shadow-xs border border-brand-700/20',
-    secondary: 'bg-slate-100 text-slate-700 hover:bg-slate-200/80 focus:ring-slate-300 border border-slate-200/80',
-    outline: 'bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900 border border-slate-200 shadow-2xs focus:ring-brand-500/20',
-    danger: 'bg-rose-600 text-white hover:bg-rose-700 active:bg-rose-800 focus:ring-rose-500/30 shadow-xs border border-rose-700/20',
-    ghost: 'bg-transparent text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 focus:ring-slate-200',
-    accent: 'bg-accent-600 text-white hover:bg-accent-700 active:bg-accent-800 focus:ring-accent-500/30 shadow-xs border border-accent-700/20',
+    primary: 'bg-brand-800 text-white hover:bg-brand-700 active:bg-brand-900 focus:ring-brand-800/25 shadow-xs border border-brand-900/30 font-medium',
+    secondary: 'bg-[#F4F2EC] text-stone-700 hover:bg-[#EBE7DE] active:bg-[#E2DDD3] focus:ring-stone-400/20 border border-[#E5E0D6]',
+    outline: 'bg-white text-stone-700 hover:bg-[#FAF8F5] hover:text-stone-900 border border-[#E5E0D6] shadow-subtle focus:ring-brand-800/15',
+    danger: 'bg-accent-600 text-white hover:bg-accent-700 active:bg-accent-800 focus:ring-accent-500/25 shadow-xs border border-accent-700/20',
+    ghost: 'bg-transparent text-stone-600 hover:bg-[#F5F2EB] hover:text-stone-900 focus:ring-stone-300',
+    accent: 'bg-brand-800 text-white hover:bg-brand-700 active:bg-brand-900 focus:ring-brand-800/25 shadow-xs border border-brand-900/30',
   };
 
   const sizes = {
