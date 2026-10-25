@@ -1,35 +1,34 @@
 -- ==============================================================================
--- STANDALONE INVENTORY MANAGEMENT SYSTEM — MYSQL 8.0 RELATIONAL SCHEMA
+-- STANDALONE INVENTORY MANAGEMENT SYSTEM — POSTGRESQL 17 SCHEMA
 -- ==============================================================================
 
--- Roles table
+-- 1. Roles table
 CREATE TABLE IF NOT EXISTS roles (
-  id INT AUTO_INCREMENT PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   name VARCHAR(30) NOT NULL UNIQUE,
   description VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+);
 
--- Users table
+-- 2. Users table
 CREATE TABLE IF NOT EXISTS users (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  role_id INT NOT NULL,
+  id SERIAL PRIMARY KEY,
+  role_id INT NOT NULL REFERENCES roles(id) ON DELETE RESTRICT,
   first_name VARCHAR(60) NOT NULL,
   last_name VARCHAR(60) NOT NULL,
   email VARCHAR(120) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
   token_version INT NOT NULL DEFAULT 1,
-  status ENUM('ACTIVE', 'INACTIVE') NOT NULL DEFAULT 'ACTIVE',
+  status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'INACTIVE')),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE RESTRICT,
-  INDEX idx_users_email (email),
-  INDEX idx_users_status (status)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_status ON users(status);
 
--- Warehouses table
+-- 3. Warehouses table
 CREATE TABLE IF NOT EXISTS warehouses (
-  id INT AUTO_INCREMENT PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
   code VARCHAR(30) NOT NULL UNIQUE,
   address VARCHAR(255) NOT NULL,
@@ -40,139 +39,117 @@ CREATE TABLE IF NOT EXISTS warehouses (
   contact_person VARCHAR(100),
   phone VARCHAR(30),
   email VARCHAR(120),
-  status ENUM('ACTIVE', 'INACTIVE') NOT NULL DEFAULT 'ACTIVE',
+  status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'INACTIVE')),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX idx_warehouses_code (code),
-  INDEX idx_warehouses_status (status)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_warehouses_code ON warehouses(code);
+CREATE INDEX IF NOT EXISTS idx_warehouses_status ON warehouses(status);
 
--- User Warehouses (Multi-warehouse assignment)
+-- 4. User Warehouses (Multi-warehouse assignment)
 CREATE TABLE IF NOT EXISTS user_warehouses (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL,
-  warehouse_id INT NOT NULL,
+  id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  warehouse_id INT NOT NULL REFERENCES warehouses(id) ON DELETE RESTRICT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE KEY uq_user_warehouse (user_id, warehouse_id),
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  FOREIGN KEY (warehouse_id) REFERENCES warehouses(id) ON DELETE RESTRICT,
-  INDEX idx_uw_user (user_id),
-  INDEX idx_uw_warehouse (warehouse_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  CONSTRAINT uq_user_warehouse UNIQUE (user_id, warehouse_id)
+);
+CREATE INDEX IF NOT EXISTS idx_uw_user ON user_warehouses(user_id);
+CREATE INDEX IF NOT EXISTS idx_uw_warehouse ON user_warehouses(warehouse_id);
 
--- Categories table
+-- 5. Categories table
 CREATE TABLE IF NOT EXISTS categories (
-  id INT AUTO_INCREMENT PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   name VARCHAR(100) NOT NULL UNIQUE,
   description TEXT,
-  status ENUM('ACTIVE', 'INACTIVE') NOT NULL DEFAULT 'ACTIVE',
+  status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'INACTIVE')),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX idx_categories_status (status)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_categories_status ON categories(status);
 
--- Products table
+-- 6. Products table
 CREATE TABLE IF NOT EXISTS products (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  category_id INT NOT NULL,
+  id SERIAL PRIMARY KEY,
+  category_id INT NOT NULL REFERENCES categories(id) ON DELETE RESTRICT,
   sku VARCHAR(50) NOT NULL UNIQUE,
   name VARCHAR(150) NOT NULL,
   description TEXT,
-  unit VARCHAR(30) NOT NULL DEFAULT 'pcs',
-  price DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
-  minimum_stock INT NOT NULL DEFAULT 10,
-  status ENUM('ACTIVE', 'INACTIVE') NOT NULL DEFAULT 'ACTIVE',
+  unit VARCHAR(30) NOT NULL DEFAULT 'units',
+  price NUMERIC(12, 2) NOT NULL DEFAULT 0.00 CHECK (price >= 0),
+  minimum_stock INT NOT NULL DEFAULT 10 CHECK (minimum_stock >= 0),
+  status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'INACTIVE')),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE RESTRICT,
-  CONSTRAINT chk_products_price CHECK (price >= 0),
-  CONSTRAINT chk_products_min_stock CHECK (minimum_stock >= 0),
-  INDEX idx_products_sku (sku),
-  INDEX idx_products_name (name),
-  INDEX idx_products_category (category_id),
-  INDEX idx_products_status (status)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_products_sku ON products(sku);
+CREATE INDEX IF NOT EXISTS idx_products_name ON products(name);
+CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id);
+CREATE INDEX IF NOT EXISTS idx_products_status ON products(status);
 
--- Inventory table (Per Product Per Warehouse)
+-- 7. Inventory table (Per Product Per Warehouse)
 CREATE TABLE IF NOT EXISTS inventory (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  product_id INT NOT NULL,
-  warehouse_id INT NOT NULL,
-  quantity INT NOT NULL DEFAULT 0,
+  id SERIAL PRIMARY KEY,
+  product_id INT NOT NULL REFERENCES products(id) ON DELETE RESTRICT,
+  warehouse_id INT NOT NULL REFERENCES warehouses(id) ON DELETE RESTRICT,
+  quantity INT NOT NULL DEFAULT 0 CHECK (quantity >= 0),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  UNIQUE KEY uq_product_warehouse (product_id, warehouse_id),
-  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT,
-  FOREIGN KEY (warehouse_id) REFERENCES warehouses(id) ON DELETE RESTRICT,
-  CONSTRAINT chk_inventory_qty_non_negative CHECK (quantity >= 0),
-  INDEX idx_inv_warehouse (warehouse_id),
-  INDEX idx_inv_product (product_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT uq_product_warehouse UNIQUE (product_id, warehouse_id)
+);
+CREATE INDEX IF NOT EXISTS idx_inv_warehouse ON inventory(warehouse_id);
+CREATE INDEX IF NOT EXISTS idx_inv_product ON inventory(product_id);
 
--- Stock Movements (Immutable Audit Trail)
+-- 8. Stock Movements (Immutable Audit Trail)
 CREATE TABLE IF NOT EXISTS stock_movements (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  product_id INT NOT NULL,
-  warehouse_id INT NOT NULL,
-  movement_type ENUM('IN', 'OUT', 'TRANSFER_IN', 'TRANSFER_OUT', 'ADJUSTMENT') NOT NULL,
-  quantity INT NOT NULL,
-  previous_quantity INT NOT NULL,
-  new_quantity INT NOT NULL,
+  id SERIAL PRIMARY KEY,
+  product_id INT NOT NULL REFERENCES products(id) ON DELETE RESTRICT,
+  warehouse_id INT NOT NULL REFERENCES warehouses(id) ON DELETE RESTRICT,
+  movement_type VARCHAR(30) NOT NULL CHECK (movement_type IN ('IN', 'OUT', 'TRANSFER_IN', 'TRANSFER_OUT', 'ADJUSTMENT')),
+  quantity INT NOT NULL CHECK (quantity > 0),
+  previous_quantity INT NOT NULL CHECK (previous_quantity >= 0),
+  new_quantity INT NOT NULL CHECK (new_quantity >= 0),
   reference VARCHAR(100),
   reason TEXT NOT NULL,
-  user_id INT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT,
-  FOREIGN KEY (warehouse_id) REFERENCES warehouses(id) ON DELETE RESTRICT,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT,
-  CONSTRAINT chk_sm_quantity_positive CHECK (quantity > 0),
-  CONSTRAINT chk_sm_prev_qty_non_negative CHECK (previous_quantity >= 0),
-  CONSTRAINT chk_sm_new_qty_non_negative CHECK (new_quantity >= 0),
-  INDEX idx_sm_product_wh (product_id, warehouse_id),
-  INDEX idx_sm_movement_type (movement_type),
-  INDEX idx_sm_created_at (created_at),
-  INDEX idx_sm_user (user_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  user_id INT NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_sm_product_wh ON stock_movements(product_id, warehouse_id);
+CREATE INDEX IF NOT EXISTS idx_sm_movement_type ON stock_movements(movement_type);
+CREATE INDEX IF NOT EXISTS idx_sm_created_at ON stock_movements(created_at);
+CREATE INDEX IF NOT EXISTS idx_sm_user ON stock_movements(user_id);
 
--- Inventory Transfers table (Atomic Inter-Warehouse Transfers)
+-- 9. Inventory Transfers table (Atomic Inter-Warehouse Transfers)
 CREATE TABLE IF NOT EXISTS inventory_transfers (
-  id INT AUTO_INCREMENT PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   transfer_code VARCHAR(50) NOT NULL UNIQUE,
-  source_warehouse_id INT NOT NULL,
-  destination_warehouse_id INT NOT NULL,
-  product_id INT NOT NULL,
-  quantity INT NOT NULL,
-  status ENUM('COMPLETED') NOT NULL DEFAULT 'COMPLETED',
+  source_warehouse_id INT NOT NULL REFERENCES warehouses(id) ON DELETE RESTRICT,
+  destination_warehouse_id INT NOT NULL REFERENCES warehouses(id) ON DELETE RESTRICT,
+  product_id INT NOT NULL REFERENCES products(id) ON DELETE RESTRICT,
+  quantity INT NOT NULL CHECK (quantity > 0),
+  status VARCHAR(30) NOT NULL DEFAULT 'COMPLETED' CHECK (status IN ('COMPLETED')),
   reference VARCHAR(100),
   reason TEXT,
-  created_by INT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (source_warehouse_id) REFERENCES warehouses(id) ON DELETE RESTRICT,
-  FOREIGN KEY (destination_warehouse_id) REFERENCES warehouses(id) ON DELETE RESTRICT,
-  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT,
-  FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT,
-  CONSTRAINT chk_it_quantity_positive CHECK (quantity > 0),
-  INDEX idx_it_code (transfer_code),
-  INDEX idx_it_source (source_warehouse_id),
-  INDEX idx_it_dest (destination_warehouse_id),
-  INDEX idx_it_created_at (created_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  created_by INT NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_it_code ON inventory_transfers(transfer_code);
+CREATE INDEX IF NOT EXISTS idx_it_source ON inventory_transfers(source_warehouse_id);
+CREATE INDEX IF NOT EXISTS idx_it_dest ON inventory_transfers(destination_warehouse_id);
+CREATE INDEX IF NOT EXISTS idx_it_created_at ON inventory_transfers(created_at);
 
--- Inventory Alerts table (State Machine: LOW_STOCK, OUT_OF_STOCK, RESOLVED)
+-- 10. Inventory Alerts table (State Machine: LOW_STOCK, OUT_OF_STOCK, RESOLVED)
 CREATE TABLE IF NOT EXISTS inventory_alerts (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  product_id INT NOT NULL,
-  warehouse_id INT NOT NULL,
+  id SERIAL PRIMARY KEY,
+  product_id INT NOT NULL REFERENCES products(id) ON DELETE RESTRICT,
+  warehouse_id INT NOT NULL REFERENCES warehouses(id) ON DELETE RESTRICT,
   current_quantity INT NOT NULL,
   minimum_stock INT NOT NULL,
-  alert_type ENUM('LOW_STOCK', 'OUT_OF_STOCK') NOT NULL,
-  status ENUM('ACTIVE', 'RESOLVED') NOT NULL DEFAULT 'ACTIVE',
-  active_status VARCHAR(10) GENERATED ALWAYS AS (IF(status = 'ACTIVE', 'ACTIVE', NULL)) STORED,
+  alert_type VARCHAR(30) NOT NULL CHECK (alert_type IN ('LOW_STOCK', 'OUT_OF_STOCK')),
+  status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'RESOLVED')),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  resolved_at TIMESTAMP NULL DEFAULT NULL,
-  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT,
-  FOREIGN KEY (warehouse_id) REFERENCES warehouses(id) ON DELETE RESTRICT,
-  UNIQUE KEY uq_active_alert (product_id, warehouse_id, active_status),
-  INDEX idx_alerts_prod_wh_status (product_id, warehouse_id, status),
-  INDEX idx_alerts_status_type (status, alert_type)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  resolved_at TIMESTAMP NULL DEFAULT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_active_alert ON inventory_alerts (product_id, warehouse_id) WHERE status = 'ACTIVE';
+CREATE INDEX IF NOT EXISTS idx_alerts_prod_wh_status ON inventory_alerts(product_id, warehouse_id, status);
+CREATE INDEX IF NOT EXISTS idx_alerts_status_type ON inventory_alerts(status, alert_type);

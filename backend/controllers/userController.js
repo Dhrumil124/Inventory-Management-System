@@ -134,7 +134,7 @@ class UserController {
           const [whCheck] = await conn.execute('SELECT id, status FROM warehouses WHERE id = ?', [whId]);
           if (whCheck.length > 0 && whCheck[0].status === 'ACTIVE') {
             await conn.execute(
-              'INSERT INTO user_warehouses (user_id, warehouse_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE id=id',
+              'INSERT INTO user_warehouses (user_id, warehouse_id) VALUES (?, ?) ON CONFLICT (user_id, warehouse_id) DO NOTHING',
               [newUserId, whId]
             );
           }
@@ -229,7 +229,7 @@ class UserController {
 
       // 3. Insert assignment
       await pool.execute(
-        'INSERT INTO user_warehouses (user_id, warehouse_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE id=id',
+        'INSERT INTO user_warehouses (user_id, warehouse_id) VALUES (?, ?) ON CONFLICT (user_id, warehouse_id) DO NOTHING',
         [userId, warehouseId]
       );
 

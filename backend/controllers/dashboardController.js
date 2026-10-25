@@ -56,7 +56,7 @@ class DashboardController {
         );
         totalProducts = whProdCount[0].total;
       } else {
-        const [prodCount] = await pool.execute('SELECT COUNT(*) AS total FROM products WHERE status = "ACTIVE"');
+        const [prodCount] = await pool.execute("SELECT COUNT(*) AS total FROM products WHERE status = 'ACTIVE'");
         totalProducts = prodCount[0].total;
       }
 
@@ -65,7 +65,7 @@ class DashboardController {
       if (warehouseId) {
         totalWarehouses = 1;
       } else if (req.user.role === ROLES.ADMIN) {
-        const [whCount] = await pool.execute('SELECT COUNT(*) AS total FROM warehouses WHERE status = "ACTIVE"');
+        const [whCount] = await pool.execute("SELECT COUNT(*) AS total FROM warehouses WHERE status = 'ACTIVE'");
         totalWarehouses = whCount[0].total;
       } else {
         totalWarehouses = req.user.assignedWarehouseIds.length;

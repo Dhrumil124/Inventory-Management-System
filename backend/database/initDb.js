@@ -1,47 +1,57 @@
 const fs = require('fs');
 const path = require('path');
-const mysql = require('mysql2/promise');
+const { Client } = require('pg');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const config = {
   host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '3306', 10),
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  multipleStatements: true
+  port: parseInt(process.env.DB_PORT || '5432', 10),
+  user: process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASSWORD || 'honorbee123'
 };
 
 const DB_NAME = process.env.DB_NAME || 'inventory_db';
 
 async function initDatabase() {
-  console.log(`[DB-INIT] Connecting to MySQL server at ${config.host}:${config.port}...`);
-  let connection;
+  console.log(`[DB-INIT] Connecting to PostgreSQL server at ${config.host}:${config.port}...`);
+  let rootClient;
+  let dbClient;
 
   try {
-    connection = await mysql.createConnection(config);
-    console.log('[DB-INIT] Connected successfully to MySQL.');
+    // 1. Connect to default 'postgres' database to check/create target database
+    rootClient = new Client({ ...config, database: 'postgres' });
+    await rootClient.connect();
+    console.log('[DB-INIT] Connected successfully to PostgreSQL.');
 
-    // 1. Create database if not exists
-    console.log(`[DB-INIT] Ensuring database '${DB_NAME}' exists...`);
-    await connection.query(
-      `CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
-    );
-    await connection.query(`USE \`${DB_NAME}\`;`);
-    console.log(`[DB-INIT] Database '${DB_NAME}' is ready.`);
+    const checkRes = await rootClient.query('SELECT 1 FROM pg_database WHERE datname = $1', [DB_NAME]);
+    if (checkRes.rowCount === 0) {
+      console.log(`[DB-INIT] Database '${DB_NAME}' does not exist. Creating...`);
+      await rootClient.query(`CREATE DATABASE "${DB_NAME}"`);
+      console.log(`[DB-INIT] Database '${DB_NAME}' created successfully.`);
+    } else {
+      console.log(`[DB-INIT] Database '${DB_NAME}' already exists.`);
+    }
+    await rootClient.end();
+    rootClient = null;
 
-    // 2. Read and apply schema
+    // 2. Connect directly to target database
+    console.log(`[DB-INIT] Connecting to database '${DB_NAME}'...`);
+    dbClient = new Client({ ...config, database: DB_NAME });
+    await dbClient.connect();
+
+    // 3. Apply schema
     const schemaPath = path.join(__dirname, 'schema.sql');
     const schemaSql = fs.readFileSync(schemaPath, 'utf8');
     console.log('[DB-INIT] Applying database schema tables and constraints...');
-    await connection.query(schemaSql);
+    await dbClient.query(schemaSql);
     console.log('[DB-INIT] Schema tables created successfully.');
 
-    // 3. Read and apply seeds
+    // 4. Apply seeds
     const seedPath = path.join(__dirname, 'seed.sql');
     if (fs.existsSync(seedPath)) {
       const seedSql = fs.readFileSync(seedPath, 'utf8');
       console.log('[DB-INIT] Applying initial seed data...');
-      await connection.query(seedSql);
+      await dbClient.query(seedSql);
       console.log('[DB-INIT] Seed data populated successfully.');
     }
 
@@ -49,17 +59,13 @@ async function initDatabase() {
     process.exit(0);
   } catch (error) {
     console.error('[DB-INIT] Initialization failed:', error.message);
-    if (connection) {
-      try {
-        await connection.end();
-      } catch (e) {
-        // ignore close error
-      }
-    }
     process.exit(1);
   } finally {
-    if (connection) {
-      await connection.end();
+    if (rootClient) {
+      try { await rootClient.end(); } catch (e) {}
+    }
+    if (dbClient) {
+      try { await dbClient.end(); } catch (e) {}
     }
   }
 }

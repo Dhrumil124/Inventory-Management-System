@@ -16,7 +16,7 @@ class InventoryController {
       const categoryId = req.query.categoryId ? parseInt(req.query.categoryId, 10) : null;
       const stockStatus = req.query.stockStatus || null;
 
-      let whereConditions = ['p.status = "ACTIVE"', 'w.status = "ACTIVE"'];
+      let whereConditions = ["p.status = 'ACTIVE'", "w.status = 'ACTIVE'"];
       let params = [];
 
       // Warehouse access boundary

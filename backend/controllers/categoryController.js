@@ -52,7 +52,7 @@ class CategoryController {
       }
 
       const [insertRes] = await pool.execute(
-        'INSERT INTO categories (name, description, status) VALUES (?, ?, "ACTIVE")',
+        "INSERT INTO categories (name, description, status) VALUES (?, ?, 'ACTIVE')",
         [name, description || null]
       );
 

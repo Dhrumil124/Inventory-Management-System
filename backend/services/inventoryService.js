@@ -15,7 +15,7 @@ class InventoryService {
     if (rows.length === 0) {
       // Create record with quantity 0
       await conn.execute(
-        'INSERT INTO inventory (product_id, warehouse_id, quantity) VALUES (?, ?, 0) ON DUPLICATE KEY UPDATE quantity = quantity',
+        'INSERT INTO inventory (product_id, warehouse_id, quantity) VALUES (?, ?, 0) ON CONFLICT (product_id, warehouse_id) DO NOTHING',
         [productId, warehouseId]
       );
       // Lock newly created or existing row
@@ -233,11 +233,11 @@ class InventoryService {
 
       // 1. Ensure inventory records exist in both warehouses
       await conn.execute(
-        'INSERT INTO inventory (product_id, warehouse_id, quantity) VALUES (?, ?, 0) ON DUPLICATE KEY UPDATE id=id',
+        'INSERT INTO inventory (product_id, warehouse_id, quantity) VALUES (?, ?, 0) ON CONFLICT (product_id, warehouse_id) DO NOTHING',
         [productId, sourceWarehouseId]
       );
       await conn.execute(
-        'INSERT INTO inventory (product_id, warehouse_id, quantity) VALUES (?, ?, 0) ON DUPLICATE KEY UPDATE id=id',
+        'INSERT INTO inventory (product_id, warehouse_id, quantity) VALUES (?, ?, 0) ON CONFLICT (product_id, warehouse_id) DO NOTHING',
         [productId, destinationWarehouseId]
       );
 

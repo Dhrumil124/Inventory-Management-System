@@ -5,22 +5,22 @@ echo  Starting Inventory Management System
 echo =====================================================
 echo.
 
-:: 1. Check and Start MySQL service
-echo [1/3] Checking MySQL80 database service...
-sc query MySQL80 | find "RUNNING" >nul
+:: 1. Check and Start PostgreSQL service
+echo [1/3] Checking PostgreSQL database service...
+sc query postgresql-x64-17 | find "RUNNING" >nul
 if errorlevel 1 (
-    echo MySQL80 is stopped. Starting MySQL80...
-    net start MySQL80
+    echo PostgreSQL is stopped. Starting postgresql-x64-17...
+    net start postgresql-x64-17
     if errorlevel 1 (
         echo.
-        echo [WARNING] Could not start MySQL automatically. 
+        echo [WARNING] Could not start PostgreSQL automatically. 
         echo If you see 'Access Denied', please right-click this script and select 'Run as administrator'.
         echo.
     ) else (
-        echo MySQL80 started successfully.
+        echo PostgreSQL started successfully.
     )
 ) else (
-    echo MySQL80 is already running.
+    echo PostgreSQL (postgresql-x64-17) is already running.
 )
 echo.
 
